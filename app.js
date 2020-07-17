@@ -1,48 +1,35 @@
 // Punto de entrada
+// Importaciones necesarias
+const express = require('express');
+const db = require('./Data/database');
+const cors = require('cors');
 
-var express = require('express');
-var db = require('./Data/database');
-var bodyParser = require('body-parser');
-
+// Creamos el servidor
 var app = express();
 
-// CORS
-app.use(function (req, res, next) {
-  res.header('Access-Control-Allow-Origin', '*');
-  res.header(
-    'Access-Control-Allow-Headers',
-    'Origin, X-Requested-With, Content-Type, Accept'
-  );
-  res.header('Access-Control-Allow-Methods', 'POST, GET, PUT, DELETE, OPTIONS');
-  next();
-});
+// COnfigurar CORS
+app.use(cors())
 
-// parse application/x-www-form-urlencoded
-app.use(
-  bodyParser.urlencoded({
-    limit: '50mb',
-    extended: false,
-    parameterLimit: 100000000,
-  })
-);
-// parse application/json
-app.use(bodyParser.json({ limit: '50mb' }));
+// Lectura y parseo del body
+app.use(express.json());
 
-var doctoresRoute = require('./Rutas/doctores');
-var agendaRoute = require('./Rutas/agenda');
-var logingRoute = require('./Rutas/auth');
-
-app.use('/doctores', doctoresRoute);
-app.use('/agenda', agendaRoute);
-app.use('/login', logingRoute);
+// Rutas
+// Rutas - Doctores
+app.use('/api/doctores', require('./Rutas/doctores.ruta'))
+app.use('/api/doctores/especialidades', require('./Rutas/especialidades.ruta'))
+app.use('/api/doctores/redessociales', require('./Rutas/redesSociales.ruta'))
+app.use('/api/doctores/idiomas', require('./Rutas/idiomas.ruta'))
+app.use('/api/doctores/experiencias', require('./Rutas/experiencia.ruta'))
+app.use('/api/doctores/estudios', require('./Rutas/estudios.ruta'))
+// Rutas - Agenda
+app.use('/api/agenda', require('./Rutas/agenda.ruta'))
 
 app.listen(3000, () => {
   console.log('Express server corriendo en el puerto 3000');
 });
 
 // Se instancia la base de datos
-db.sequelize
-  .authenticate()
+db.sequelize.authenticate()
   .then(() => {
     console.log('Se ha conectado correctamenta a la Base de datos.');
   })

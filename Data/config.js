@@ -1,9 +1,9 @@
 module.exports = {
   database: {
-    DB_USERNAME: 'asalguero',
+    DB_USERNAME: 'admin',
     DB_PASSWORD: '..perrito1',
     DB_NAME: 'Directorio',
-    DB_HOST: '192.168.30.7',
+    DB_HOST: '127.0.0.1',
     DB_INSTANCE_NAME: 'MSSQLSERVER',
   },
 };
