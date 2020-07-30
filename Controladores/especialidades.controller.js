@@ -1,50 +1,25 @@
 const db = require('../Data/database');
+const { storeProcedure } = require('../Utilidades/db.utils')
 
 const crearEspecialidad = async (objecto) => {
-    let data = await db.sequelize.query(
-      'EXEC dbo.CrearNuevaEspecialidad @Descripcion = :descripcion, @IdDoctor = :doctorid',
-      {
-        replacements: {
-          descripcion: objecto.descripcion,
-          doctorid: objecto.doctorid,
-        },
-      }
-    )
-    .catch( err => { throw err})
+  const data = await storeProcedure('CrearNuevaEspecialidad',objecto)
     
-    return data[0];
+  return data[0];
 }
 
 const actualizarEspecialidad = async (params,objeto) => {
-    let data = await db.sequelize.query(
-      'EXEC dbo.ActualizarEspecialidades  @IdEspecialiad = :idespecialidad, @IdDoctor = :doctorid, @Descripcion = :descripcion',
-      {
-        replacements: {
-          descripcion: objeto.descripcion,
-          idespecialidad: params.idespecialidad,
-          doctorid: params.doctorid,
-        },
-      }
-    )
-    .catch( err => { throw err})
-    
-    return data[0];
+  const { descripcion} = objeto
+  const { idespecialidad, doctorid } = params
+
+  const data = await storeProcedure('ActualizarEspecialidades', {IdEspecialiad: idespecialidad, IdDoctor: doctorid, Descripcion: descripcion })
+      
+  return data[0];
 } 
 
 const eliminarEspecialidad = async (params) => {
-    let data = await db.sequelize.query(
-      'EXEC dbo.EliminarEspecialidad  @IdEspecialidad = :idespecialidad, @IdDoctor = :doctorid',
-      {
-        replacements: {
-          idespecialidad: params.idespecialidad,
-          doctorid: params.doctorid,
-        },
-      }
-    )
-    .catch( err => { throw err})
-    
-    console.log(data);
-    return data[0];
+  const data = await storeProcedure('EliminarEspecialidad', params);
+  
+  return data[0];
 } 
 
 module.exports = {

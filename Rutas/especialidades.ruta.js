@@ -5,28 +5,24 @@
 */
 const { Router } = require('express');
 const { crearEspecialidad, actualizarEspecialidad, eliminarEspecialidad } = require('../Controladores/especialidades.controller');
+const { validarJWT } = require('../middlewares/jwt.middleware');
+const { validarCampos } = require('../middlewares/fieldValidator.middleware')
+const { check } = require('express-validator');
 
 const router = Router();
 
 //////////
 // Post
 //////////
-router.post('/', async (req, res) => {
+router.post('/',
+[
+  check('IdDoctor', 'El campo IdDoctor es obligatorio').not().isEmpty(),
+  check('IdDoctor', 'El campo IdDoctor debe ser un identificador tipo INT válido').isNumeric(),
+  check('descripcion', 'El campo descripcion es obligatorio').not().isEmpty(),
+  validarCampos
+],
+ async (req, res) => {
     var body = req.body;
-  
-    if(body.descripcion === "" || body.descripcion === null || body.descripcion === undefined) {
-      return res.status(400).json({
-        ok: false,
-        mensaje: "Debe ingresar la especialidad"
-      });
-    }
-  
-    if(body.doctorid === "" || body.doctorid === null || body.doctorid === undefined) {
-      return res.status(400).json({
-        ok: false,
-        mensaje: "Debe ingresar el id del doctor al que desea añadir una especialidad"
-      });
-    }
 
     try {
         const data = await crearEspecialidad(body);
@@ -47,17 +43,15 @@ router.post('/', async (req, res) => {
 //////////
 // Put
 //////////
-router.put('/:idespecialidad/doctor/:doctorid', async (req, res) => {
+router.put('/:idespecialidad/doctor/:doctorid',
+[
+  check('descripcion', 'El campo descripcion es obligatorio').not().isEmpty(),
+  validarCampos
+], 
+async (req, res) => {
     var body = req.body;
     var params = req.params;
-  
-    if(body.descripcion === "" || body.descripcion === null || body.descripcion === undefined) {
-      return res.status(400).json({
-        ok: false,
-        mensaje: "Debe ingresar la especialidad"
-      });
-    }
-  
+
     try {
         const data = await actualizarEspecialidad(params,body);
         
@@ -68,7 +62,7 @@ router.put('/:idespecialidad/doctor/:doctorid', async (req, res) => {
       }catch (error) {
         return res.status(500).json({
           ok: false,
-          mensaje: 'Error al insertar el nuevo registro',
+          mensaje: 'Error al eliminar el registro',
           errors: error
         });
       }
@@ -77,7 +71,7 @@ router.put('/:idespecialidad/doctor/:doctorid', async (req, res) => {
 //////////
 // Delete
 //////////
-router.delete('/:idespecialidad/doctor/:doctorid',async (req, res) => {
+router.delete('/:idespecialidad/doctor/:IdDoctor',async (req, res) => {
     var params = req.params;
   
     try {

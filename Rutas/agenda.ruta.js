@@ -5,6 +5,7 @@
 */
 const { Router } = require('express');
 const { obtenerEventosAgenda, actualizarEventoAgenda, agregarEventoAgenda } = require('../Controladores/agenda.controller');
+const { validarJWT } = require('../middlewares/jwt.middleware');
 
 const router = Router();
 

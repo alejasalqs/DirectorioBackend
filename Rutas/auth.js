@@ -1,63 +1,38 @@
-var express = require('express');
-var db = require('../Data/database');
-var bcrypt = require('bcryptjs');
-var jwt = require('jsonwebtoken');
-var SEED = require('../Data/config').SEED;
+/*
 
-var app = express();
+  Ruta: /api/auth
 
-app.post('/', (req, res) => {
+*/
+const { Router } = require('express');
+const { autenticaLogin } = require('../Controladores/auth.controller');
+const { check } = require('express-validator');
+const { validarCampos } = require('../middlewares/fieldValidator.middleware');
+
+const router = Router();
+
+router.post('/login',[
+  check('correo','El campo correo es obligatorio').not().isEmpty(),
+  check('correo','El campo correo debe ser un correo válido').isEmail(),
+  check('contrasena','El campo contraseña es obligatorio').not().isEmpty(),
+  validarCampos
+],async (req, res) => {
   var body = req.body;
 
-  if (!body.correo) {
-    return res.status(400).json({
+  try {
+    const data = await autenticaLogin(body);
+
+    if(data.ok){
+      return res.status(200).json(data);
+    } else {
+      return res.status(401).json(data);
+    }
+  }catch (error) {
+    return res.status(500).json({
       ok: false,
-      mensaje: 'Por favor ingrese un correo válido',
+      mensaje: 'Error al validar los datos',
+      errors: error
     });
   }
-
-  if (!body.contrasena) {
-    return res.status(400).json({
-      ok: false,
-      mensaje: 'Por favor ingrese la contraseña',
-    });
-  }
-
-  db.sequelize
-    .query('EXEC dbo.AutorizarLoginDoctor  @Correo = :correo', {
-      replacements: { correo: body.correo },
-    })
-    .then((doctorDB) => {
-      console.log(doctorDB[1]);
-      if (doctorDB[1] === 0) {
-        return res.status(401).json({
-          ok: false,
-          mensaje: 'Credenciales incorrectas - email',
-        });
-      }
-
-      if (!bcrypt.compareSync(body.contrasena, doctorDB[0][0].Contrasena)) {
-        return res.status(401).json({
-          ok: false,
-          mensaje: 'Credenciales incorrectas - password',
-          //errors: err,
-        });
-      }
-
-      doctorDB[0][0].Contrasena = ':)';
-      // Crear token
-      //jwt.sign({ payload: payload }, 'seed', {expiresIn: expiracion,});
-      var token = jwt.sign({ doctor: doctorDB[0][0] }, SEED, {
-        expiresIn: 14400,
-      });
-
-      return res.status(200).json({
-        ok: true,
-        mensaje: 'Login correcto',
-        doctor: doctorDB[0][0],
-        token: token,
-      });
-    });
 });
 
-module.exports = app;
+module.exports = router;

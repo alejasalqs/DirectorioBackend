@@ -14,6 +14,8 @@ app.use(cors())
 app.use(express.json());
 
 // Rutas
+// Rutas - Autenticaciones
+app.use('/api/auth', require('./Rutas/auth'))
 // Rutas - Doctores
 app.use('/api/doctores', require('./Rutas/doctores.ruta'))
 app.use('/api/doctores/especialidades', require('./Rutas/especialidades.ruta'))

@@ -5,36 +5,22 @@
 */
 const { Router } = require('express');
 const { crearRedSocial, actualizarRedSocial, eliminarRedSocial  } = require('../Controladores/redesSociales.controller');
+const { validarCampos } = require('../middlewares/fieldValidator.middleware')
+const { check } = require('express-validator');
 
 const router = Router();
 
 //////////
 // Post
 //////////
-router.post('/', async (req, res) => {
+router.post('/', [
+  check('url', 'El campo url es obligatorio').not().isEmpty(),
+  check('IdDoctor', 'El campo IdDoctor debe ser un identificador tipo INT válido').isNumeric(),
+  check('descripcion', 'El campo descripcion es obligatorio').not().isEmpty(),
+  validarCampos
+], async (req, res) => {
     var body = req.body;
-  
-    if(body.url === "" || body.url === null || body.url === undefined) {
-      return res.status(400).json({
-        ok: false,
-        mensaje: "Debe ingresar la url de la red social"
-      });
-    }
-  
-    if(body.descripcion === "" || body.descripcion === null || body.descripcion === undefined) {
-      return res.status(400).json({
-        ok: false,
-        mensaje: "Debe ingresar el tipo de red social"
-      });
-    }
-  
-    if(body.doctorid === "" || body.doctorid === null || body.doctorid === undefined) {
-      return res.status(400).json({
-        ok: false,
-        mensaje: "Debe ingresar el id del doctor al que desea añadir una red social"
-      });
-    }
-  
+     
     try {
         const data = await crearRedSocial(body);
         
@@ -54,11 +40,10 @@ router.post('/', async (req, res) => {
 //////////
 // Put
 //////////
-router.put('/:redsocialid/doctor/:doctorid', async (req, res) => {
+router.put('/:IdRedesSociales/doctor/:IdDoctor', async (req, res) => {
     var body = req.body;
     var params = req.params;
   
-      
     try {
         const data = await actualizarRedSocial(params,body);
         
@@ -78,7 +63,7 @@ router.put('/:redsocialid/doctor/:doctorid', async (req, res) => {
 //////////
 // Delete
 //////////
-router.delete('/:redsocialid/doctor/:doctorid', async (req, res) => {
+router.delete('/:IdRedesSociales/doctor/:IdDoctor', async (req, res) => {
     var params = req.params;
   
     try {

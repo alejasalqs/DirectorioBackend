@@ -13,6 +13,7 @@ const router = Router();
 //////////
 router.get('/', async (req, res) => {
   try {
+    console.log(req.query)
     const data = await obtenerDoctores(req.query);
     
     return res.status(200).json({
@@ -38,7 +39,7 @@ router.get('/:id', async (req, res) => {
     
     return res.status(200).json({
       ok: true,
-      doctores: data
+      doctor: data
     });
   }catch (error) {
     return res.status(500).json({

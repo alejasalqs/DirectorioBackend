@@ -5,29 +5,20 @@
 */
 const { Router } = require('express');
 const { crearIdioma, actualizarIdioma, eliminarIdioma } = require('../Controladores/idiomas.controller');
+const { check } = require('express-validator');
 
 const router = Router();
 
 //////////
 // Post
 //////////
-router.post('/', async (req, res) => {
+router.post('/',[
+  check('descripcion', 'El campo descripcion es obligatorio').not().isEmpty(),
+  check('IdDoctor', 'El campo IdDoctor es obligatorio').not().isEmpty().isNumeric(),
+  check('IdDoctor', 'El campo IdDoctor debe ser un identificador tipo INT válido').isNumeric(),
+],async (req, res) => {
     var body = req.body;
-  
-    if(body.descripcion === "" || body.descripcion === null || body.descripcion === undefined) {
-      return res.status(400).json({
-        ok: false,
-        mensaje: "Debe ingresar el idioma"
-      });
-    }
-  
-    if(body.doctorid === "" || body.doctorid === null || body.doctorid === undefined) {
-      return res.status(400).json({
-        ok: false,
-        mensaje: "Debe ingresar el id del doctor al que desea añadir un idioma"
-      });
-    }
-  
+
     try {
         const data = await crearIdioma(body);
         
@@ -48,7 +39,7 @@ router.post('/', async (req, res) => {
 //////////
 // Put
 //////////
-router.put('/:ididioma/doctor/:doctorid', async (req, res) => {
+router.put('/:ididioma/doctor/:IdDoctor', async (req, res) => {
     var body = req.body; 
     var params = req.params;
   
@@ -79,7 +70,7 @@ router.put('/:ididioma/doctor/:doctorid', async (req, res) => {
 //////////
 // Delete
 //////////
-router.delete('/:ididioma/doctor/:doctorid', async (req, res) => {
+router.delete('/:ididioma/doctor/:IdDoctor', async (req, res) => {
     var params = req.params;
 
     try {

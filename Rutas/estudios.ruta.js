@@ -5,35 +5,21 @@
 */
 const { Router } = require('express');
 const { crearEstudio, actualizarEstudio, eliminarEstudio  } = require('../Controladores/estudios.controller');
+const { check } = require('express-validator');
+const { validarCampos } = require('../middlewares/fieldValidator.middleware');
 
 const router = Router();
 
 //////////
 // Post
 //////////
-router.post('/', async (req, res) => {
+router.post('/',[
+  check('Grado','El campo grado es campo obligatorio').not().isEmpty(),
+  check('FechaInicial','El campo FechaInicial es campo obligatorio').not().isEmpty(),
+  check('IdDoctor','El campo IdDoctor es campo obligatorio').not().isEmpty(),
+  validarCampos
+],async (req, res) => {
     var body = req.body;
-  
-    if(body.grado === "" || body.grado === null || body.grado === undefined) {
-      return res.status(400).json({
-        ok: false,
-        mensaje: "Debe ingresar el grado de estudio"
-      });
-    }
-  
-    if(body.fechainicial === "" || body.fechainicial === null || body.fechafinal === undefined) {
-      return res.status(400).json({
-        ok: false,
-        mensaje: "Debe ingresar la fecha inicial del tiempo de estudio"
-      });
-    }
-  
-    if(body.doctorid === "" || body.doctorid === null || body.doctorid === undefined) {
-      return res.status(400).json({
-        ok: false,
-        mensaje: "Debe ingresar el id del doctor al que desea añadir un estudio"
-      });
-    }
   
     try {
         const data = await crearEstudio(body);
@@ -54,7 +40,7 @@ router.post('/', async (req, res) => {
   //////////
   // Put
   //////////
-  router.put('/:estudioid/doctor/:doctorid', async (req, res) => {
+  router.put('/:IdEstudio/doctor/:IdDoctor', async (req, res) => {
     var body = req.body;
     var params = req.params;
   
@@ -77,7 +63,7 @@ router.post('/', async (req, res) => {
   //////////
   // Delete
   //////////
-  router.delete('/:estudioid/doctor/:doctorid', async (req, res) => {
+  router.delete('/:IdEstudio/doctor/:IdDoctor', async (req, res) => {
     var params = req.params;
   
     try {

@@ -1,61 +1,25 @@
 const db = require('../Data/database');
+const { storeProcedure } = require('../Utilidades/db.utils');
 
 
 const crearExperiencia = async (objeto) => {
-    let data = await db.sequelize
-    .query(
-      'EXEC dbo.CrearNuevaExperiencia @Puesto = :puesto,@LugarTrabajo = :lugartrabajo,@FechaInicial = :fechainicial,@FechaFinal = :fechafinal,@Labores = :labores, @IdDoctor = :doctorid',
-      {
-        replacements: {
-          puesto: objeto.puesto,
-          lugartrabajo: objeto.lugartrabajo,
-          fechainicial: objeto.fechainicial,
-          fechafinal: objeto.fechafinal,
-          labores: objeto.labores,
-          doctorid: objeto.doctorid,
-        },
-      }
-    )
-    .catch( err => { throw err})
+  const data = await storeProcedure('CrearNuevaExperiencia',objeto);
     
-    return data[0];
+  return data[0];
 }
 
 const actualizarExperiencia = async (params, objeto) => {
-    let data = await db.sequelize
-    .query(
-      'EXEC dbo.ActualizarExperiencia @Puesto = :puesto, @LugarTrabajo = :lugartrabajo,@FechaInicial = :fechainicial,@FechaFinal = :fechafinal,@Labores = :labores, @IdDoctor = :doctorid, @IdExperiencia = :experienciasid',
-      {
-        replacements: {
-          puesto: objeto.puesto || null,
-          lugartrabajo: objeto.lugartrabajo || null,
-          fechainicial: objeto.fechainicial || null,
-          fechafinal: objeto.fechafinal || null,
-          labores: objeto.labores || null,
-          doctorid: params.doctorid,
-          experienciasid: params.experienciasid,
-        },
-      }
-    )
-    .catch( err => { throw err})
+  objeto.IdDoctor = params.IdDoctor;
+  objeto.IdExperiencia = params.IdExperiencia;
+  const data = await storeProcedure('ActualizarExperiencia', objeto)
     
-    return data[0];
+  return data[0];
 }
 
 const eliminarExperiencia = async (params) => {
-    let data = await db.sequelize
-    .query(
-      'EXEC dbo.EliminarExperiencia @IdDoctor = :doctorid, @IdExperiencia = :experienciasid',
-      {
-        replacements: {
-          doctorid: params.doctorid,
-          experienciasid: params.experienciasid,
-        },
-      }
-    )
-    .catch( err => { throw err})
+  const data = await storeProcedure('EliminarExperiencia', params)
     
-    return data[0];
+  return data[0];
 }
 
 module.exports = {

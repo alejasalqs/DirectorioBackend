@@ -1,91 +1,109 @@
 const db = require('../Data/database');
 const { parseStringToJson } = require('../Utilidades/string.utils')
 var bcrypt = require('bcryptjs');
+const { storeProcedure } = require('../Utilidades/db.utils');
 
+  /**
+   * Obtiene todos los doctores de la tabla doctores.
+   * 
+   * 
+   * @param {Object} parametros (Opcional) Parametros para filtrar sobre los resultados.
+   * 
+   * 
+   * @example (Termino) = Obtiene los doctores de un termino en especifico: Dentista, Ginecologo, Oncologo ...
+   *  (Genero) = Obtiene los doctores filtrando sobre su genero.
+   *  (Locacion) = Obtiene los doctores de una localidad especifica ...
+   */
 const obtenerDoctores = async (objeto) => {
-    
-    let data = await db.sequelize.query('EXEC dbo.ObtenerDoctores @Termino = :termino, @Genero = :genero, @Locacion = :locacion',
-      {
-        replacements: {
-          termino: objeto.termino || null,
-          genero: objeto.genero || null,
-          locacion: objeto.locacion || null,
-        },
-      }
-    )
-    .catch( err => { throw err})
-    
-    data = await parseStringToJson(data[0]);
-      
-    return data;
+
+  let data = await storeProcedure('ObtenerDoctores', objeto);
+
+  data = await parseStringToJson(data);
+
+  return data;
 }
 
+/**
+   * Obtiene el doctor con el ID especificado.
+   * 
+   * 
+   * @param {int} id (Obligatorio) ID del doctor a especificar.
+   * 
+   */
 const obtenerDoctorPorID = async (id) => {
-    let data = await db.sequelize.query('EXEC dbo.ObtenerDoctorID @IdDoctor = :id', {
-      replacements: { id: id },
-    })
-    .catch( err => { throw err})
+
+    let data = await storeProcedure('ObtenerDoctorID', { IdDoctor: id })
     
     data = await parseStringToJson(data[0]);
       
     return data;
 }
 
+/**
+   * Crea un doctor nuevo.
+   * 
+   * 
+   * @param {Object} objeto (Opcional) Campos necesarios para la creación del doctor nuevo.
+   * 
+   * 
+   * @example Campos necesarios
+   * 
+   * "Nombre": "",
+   * "PrimerApellido": "",
+   * "SegundoApellido": "",
+   * "Correo": "",
+   * "Celular": "",
+   * "Genero": 0,
+   * "FechaNacimiento": "",
+   * "Locacion": ""
+   * 
+   * 
+   */
 const crearDoctor = async (objeto) => {
-    let data = await db.sequelize.query(
-      'EXEC dbo.CrearNuevoDoctor @Nombre = :nombre, @PrimerApellido = :primerApellido, @SegundoApellido = :segundoApellido, @Correo = :correo, @Contrasena = :contrasena,  @Celular = :celular, @Genero = :genero ,@Locacion = :locacion,@FechaNacimiento = :fechaNacimiento',
-      {
-        replacements: {
-          nombre: objeto.nombre,
-          primerApellido: objeto.primerApellido,
-          segundoApellido: objeto.segundoApellido || '',
-          correo: objeto.correo,
-          contrasena: bcrypt.hashSync(objeto.contrasena, 10),
-          celular: objeto.celular,
-          genero: objeto.genero || true,
-          fechaNacimiento: objeto.fechaNacimiento,
-          locacion: objeto.locacion,
-        },
-      }
-    )
-    .catch( err => { throw err})
-    
-    return data[0];
-}
-
-const actualizarDoctor = async (id,objeto) => {
-    
-  let data = db.sequelize.query(
-    'EXEC dbo.ActualizarDoctorExistente @Nombre = :nombre, @PrimerApellido = :primerApellido, @SegundoApellido = :segundoApellido, @Correo = :correo, @Contrasena = :contrasena, @WebURL = :paginaWeb, @Celular = :celular, @TelefonoOficina = :telefonoOficiona ,@Genero = :genero ,@Locacion = :locacion,	@SobreMi = :sobreMi,@Foto = :foto,@FechaNacimiento = :fechaNacimiento, @DoctorID  = :id ',
-    {
-      replacements: {
-        nombre: objeto.nombre || null,
-        primerApellido: objeto.primerApellido || null,
-        segundoApellido: objeto.segundoApellido || null,
-        correo: objeto.correo || null,
-        contrasena: objeto.contrasena || null,
-        paginaWeb: objeto.paginaWeb || null,
-        celular: objeto.celular || null,
-        telefonoOficiona: objeto.telefonoOficiona || null,
-        genero: objeto.genero || null,
-        sobreMi: objeto.sobreMi || null,
-        foto: objeto.foto || null,
-        fechaNacimiento: objeto.fechaNacimiento || null,
-        locacion: objeto.locacion || null,
-        id: id,
-      },
-    }
-  )
-  .catch( err => { throw err})
+  let data = await storeProcedure('CrearNuevoDoctor', objeto);
     
   return data[0];
 }
 
+/**
+   * Crea un doctor nuevo.
+   * 
+   * 
+   * @param {Object} objeto (Opcional) Campos necesarios para la creación del doctor nuevo.
+   * 
+   * 
+   * @example Campos necesarios
+   * 
+   * "Nombre": "",
+   * "PrimerApellido": "",
+   * "SegundoApellido": "",
+   * "Correo": "",
+   * "Celular": "",
+   * "Genero": 0,
+   * "FechaNacimiento": "",
+   * "Locacion": ""
+   * 
+   * 
+   */
+const actualizarDoctor = async (id,objeto) => {
+  
+  objeto.DoctorID = id;
+
+  let data = await storeProcedure('ActualizarDoctorExistente', objeto);
+    
+  return data[0];
+}
+
+/**
+   * Elimina el doctor con el ID especificado.
+   * 
+   * 
+   * @param {int} id (Obligatorio) ID del doctor a eliminar.
+   * 
+   */
 const eliminarDoctor = async(id) => {
-    let data = await db.sequelize.query('EXEC dbo.EliminarDoctor @IdDoctor = :id', {
-        replacements: { id: id },
-    })
-    .catch( err => { throw err})
+
+  let data = await storeProcedure('EliminarDoctor', {IdDoctor : id}) 
         
     return data[0];
 }

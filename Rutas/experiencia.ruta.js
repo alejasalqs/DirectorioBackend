@@ -5,35 +5,19 @@
 */
 const { Router } = require('express');
 const { crearExperiencia, actualizarExperiencia, eliminarExperiencia } = require('../Controladores/experiencia.controller');
+const { check } = require('express-validator');
 
 const router = Router();
 
 //////////
 // Post
 //////////
-router.post('/', async (req, res) => {
+router.post('/',[
+  check('Puesto','El campos Puesto es un campo obligatorio').not().isEmpty(),
+  check('FechaInicial','El campos FechaInicial es un campo obligatorio').not().isEmpty(),
+  check('IdDoctor','El campos IdDoctor es un campo obligatorio').not().isEmpty(),
+],async (req, res) => {
     var body = req.body;
-  
-    if(body.puesto === "" || body.puesto === null || body.puesto === undefined) {
-      return res.status(400).json({
-        ok: false,
-        mensaje: "Debe ingresar el puesto que desempeñó"
-      });
-    }
-  
-    if(body.fechainicial === "" || body.fechainicial === null || body.fechainicial === undefined) {
-      return res.status(400).json({
-        ok: false,
-        mensaje: "Debe ingresar la fecha inicial del puesto que desempeñó"
-      });
-    }
-  
-    if(body.doctorid === "" || body.doctorid === null || body.doctorid === undefined) {
-      return res.status(400).json({
-        ok: false,
-        mensaje: "Debe ingresar el id del doctor al que desea añadir una experiencia"
-      });
-    }
   
     try {
         const data = await crearExperiencia(body);
@@ -43,6 +27,7 @@ router.post('/', async (req, res) => {
           mensaje: data
         });
       }catch (error) {
+        console.log(error);
         return res.status(500).json({
           ok: false,
           mensaje: 'Error al insertar el nuevo registro',
@@ -54,7 +39,7 @@ router.post('/', async (req, res) => {
 //////////
 // Put
 //////////
-router.put('/:experienciasid/doctor/:doctorid', async (req, res) => {
+router.put('/:IdExperiencia/doctor/:IdDoctor', async (req, res) => {
     var body = req.body;
     var params = req.params;
   
@@ -78,7 +63,7 @@ router.put('/:experienciasid/doctor/:doctorid', async (req, res) => {
 //////////
 // Delete
 //////////
-router.delete('/:experienciasid/doctor/:doctorid', async (req, res) => {
+router.delete('/:IdExperiencia/doctor/:IdDoctor', async (req, res) => {
     var params = req.params;
 
     try {
