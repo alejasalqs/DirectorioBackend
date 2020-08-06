@@ -1,7 +1,7 @@
 /**
-   * Convierte valores de cadena de texto a un objeto tipo JSON.
+   * Recibe un objeto con los parámetros de un SP.
    * 
-   * @param {Object} obj (Obligatorio) Objeto que se quiere convertir.
+   * @param {Object} obj (Opcional) Parametros.
    */
 const parseStringToJson = async (obj) => {
     for(var key of Object.keys(obj)){
@@ -39,7 +39,18 @@ const parseStringToJson = async (obj) => {
     return str
 }
 
+const generarStringRandom = async (length) => {
+    var result           = '';
+    var characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    var charactersLength = characters.length;
+    for ( var i = 0; i < length; i++ ) {
+       result += characters.charAt(Math.floor(Math.random() * charactersLength));
+    }
+    return result;
+ }
+
 module.exports = {
     parseStringToJson,
-    reemplazarStringStoreProcedure
+    reemplazarStringStoreProcedure,
+    generarStringRandom
 }

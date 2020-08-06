@@ -39,16 +39,9 @@ router.post('/',[
 //////////
 // Put
 //////////
-router.put('/:ididioma/doctor/:IdDoctor', async (req, res) => {
+router.put('/:IdIdioma/doctor/:IdDoctor', async (req, res) => {
     var body = req.body; 
     var params = req.params;
-  
-    if(body.descripcion === "" || body.descripcion === null || body.descripcion === undefined) {
-      return res.status(400).json({
-        ok: false,
-        mensaje: "Debe ingresar el nuevo idioma"
-      });
-    }
   
     try {
         const data = await actualizarIdioma(params,body);

@@ -25,6 +25,8 @@ app.use('/api/doctores/experiencias', require('./Rutas/experiencia.ruta'))
 app.use('/api/doctores/estudios', require('./Rutas/estudios.ruta'))
 // Rutas - Agenda
 app.use('/api/agenda', require('./Rutas/agenda.ruta'))
+// Rutas -  Subir Archivo
+app.use('/api/uploads', require('./Rutas/uploads.route'))
 
 app.listen(3000, () => {
   console.log('Express server corriendo en el puerto 3000');

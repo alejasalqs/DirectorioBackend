@@ -6,7 +6,7 @@
 const { Router } = require('express');
 const { crearExperiencia, actualizarExperiencia, eliminarExperiencia } = require('../Controladores/experiencia.controller');
 const { check } = require('express-validator');
-
+const { validarCampos } = require('../middlewares/fieldValidator.middleware')
 const router = Router();
 
 //////////
@@ -16,6 +16,7 @@ router.post('/',[
   check('Puesto','El campos Puesto es un campo obligatorio').not().isEmpty(),
   check('FechaInicial','El campos FechaInicial es un campo obligatorio').not().isEmpty(),
   check('IdDoctor','El campos IdDoctor es un campo obligatorio').not().isEmpty(),
+  validarCampos
 ],async (req, res) => {
     var body = req.body;
   

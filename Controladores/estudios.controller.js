@@ -1,7 +1,13 @@
 const db = require('../Data/database');
 const { storeProcedure } = require('../Utilidades/db.utils');
+const { darFormatoFechaDDMMYYYY } = require('../Utilidades/fechas.utils')
 
 const crearEstudio = async(objeto) => {
+
+  console.log(objeto)
+  objeto = await darFormatoFechaDDMMYYYY(objeto);
+  console.log(objeto)
+
   const data = await storeProcedure('CrearNuevoEstudio',objeto);
     
  return data[0];

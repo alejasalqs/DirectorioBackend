@@ -60,13 +60,17 @@ const obtenerDoctorPorID = async (id) => {
    * 
    */
 const crearDoctor = async (objeto) => {
+
+  const salt = bcrypt.genSaltSync();
+  objeto.contrasena = bcrypt.hashSync(objeto.contrasena,salt);
+   
   let data = await storeProcedure('CrearNuevoDoctor', objeto);
     
   return data[0];
 }
 
 /**
-   * Crea un doctor nuevo.
+   * Actualiza un doctor existente.
    * 
    * 
    * @param {Object} objeto (Opcional) Campos necesarios para la creación del doctor nuevo.

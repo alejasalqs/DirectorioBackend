@@ -1,4 +1,4 @@
-const { reemplazarStringStoreProcedure, parseStringToJson } = require('./string.utils')
+const { reemplazarStringStoreProcedure } = require('./string.utils')
 const db = require('../Data/database');
 
 /**
@@ -16,7 +16,6 @@ const storeProcedure = async (nombre, parametros) => {
           opts.replacements = parametros
       }
   
-      console.log(`EXEC dbo.${nombre} ${reemplazarStringStoreProcedure(parametros)}`)
       let data = await db.sequelize.query(`EXEC dbo.${nombre} ${reemplazarStringStoreProcedure(parametros)}`, opts).catch(err => {
           console.error(err); 
           throw err 

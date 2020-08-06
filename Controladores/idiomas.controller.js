@@ -8,7 +8,7 @@ const crearIdioma = async (objeto) => {
 }
 
 const actualizarIdioma = async (params, objeto) => {
-  objeto.ididioma =  params.ididioma;
+  objeto.IdIdioma =  params.IdIdioma;
   objeto.IdDoctor = params.IdDoctor;
   const data = await storeProcedure('ActualizarIdioma', objeto)
     
