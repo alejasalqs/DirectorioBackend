@@ -2,6 +2,7 @@ const db = require('../Data/database');
 const { parseStringToJson } = require('../Utilidades/string.utils')
 var bcrypt = require('bcryptjs');
 const { storeProcedure } = require('../Utilidades/db.utils');
+const { darFormatoFechaDDMMYYYY } = require('../Utilidades/fechas.utils');
 
   /**
    * Obtiene todos los doctores de la tabla doctores.
@@ -17,6 +18,15 @@ const { storeProcedure } = require('../Utilidades/db.utils');
 const obtenerDoctores = async (objeto) => {
 
   let data = await storeProcedure('ObtenerDoctores', objeto);
+
+  data = await parseStringToJson(data);
+
+  return data;
+}
+
+const obtenerNombreDoctores = async () => {
+
+  let data = await storeProcedure('ObtenerNombreDoctores');
 
   data = await parseStringToJson(data);
 
@@ -93,6 +103,8 @@ const actualizarDoctor = async (id,objeto) => {
   
   objeto.DoctorID = id;
 
+  //let data = darFormatoFechaDDMMYYYY(objeto)
+
   let data = await storeProcedure('ActualizarDoctorExistente', objeto);
     
   return data[0];
@@ -117,5 +129,6 @@ module.exports = {
     obtenerDoctorPorID,
     crearDoctor,
     actualizarDoctor,
-    eliminarDoctor
+    eliminarDoctor,
+    obtenerNombreDoctores
 }

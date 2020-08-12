@@ -6,6 +6,8 @@
 const { Router } = require('express');
 const { crearIdioma, actualizarIdioma, eliminarIdioma } = require('../Controladores/idiomas.controller');
 const { check } = require('express-validator');
+const { validarCampos } = require('../middlewares/fieldValidator.middleware');
+const { validarJWT } = require('../middlewares/jwt.middleware');
 
 const router = Router();
 
@@ -16,7 +18,10 @@ router.post('/',[
   check('descripcion', 'El campo descripcion es obligatorio').not().isEmpty(),
   check('IdDoctor', 'El campo IdDoctor es obligatorio').not().isEmpty().isNumeric(),
   check('IdDoctor', 'El campo IdDoctor debe ser un identificador tipo INT válido').isNumeric(),
-],async (req, res) => {
+  validarCampos,
+  validarJWT
+],async (req, res, next) => {
+  console.log('\x1b[36m%s\x1b[0m','POST /api/doctores/idiomas')
     var body = req.body;
 
     try {
@@ -27,11 +32,7 @@ router.post('/',[
           mensaje: data
         });
       }catch (error) {
-        return res.status(500).json({
-          ok: false,
-          mensaje: 'Error al insertar el nuevo registro',
-          errors: error
-        });
+        next(error)
       }
 });
   
@@ -39,7 +40,8 @@ router.post('/',[
 //////////
 // Put
 //////////
-router.put('/:IdIdioma/doctor/:IdDoctor', async (req, res) => {
+router.put('/:IdIdioma/doctor/:IdDoctor',validarJWT, async (req, res, next) => {
+  console.log('\x1b[36m%s\x1b[0m','PUT /api/doctores/idiomas')
     var body = req.body; 
     var params = req.params;
   
@@ -51,11 +53,7 @@ router.put('/:IdIdioma/doctor/:IdDoctor', async (req, res) => {
           mensaje: data
         });
       }catch (error) {
-        return res.status(500).json({
-          ok: false,
-          mensaje: 'Error al actualizar el registro',
-          errors: error
-        });
+        next(error)
       }
 });
 
@@ -63,7 +61,8 @@ router.put('/:IdIdioma/doctor/:IdDoctor', async (req, res) => {
 //////////
 // Delete
 //////////
-router.delete('/:ididioma/doctor/:IdDoctor', async (req, res) => {
+router.delete('/:ididioma/doctor/:IdDoctor',validarJWT, async (req, res, next) => {
+  console.log('\x1b[36m%s\x1b[0m','DELETE /api/doctores/idiomas')
     var params = req.params;
 
     try {
@@ -74,11 +73,7 @@ router.delete('/:ididioma/doctor/:IdDoctor', async (req, res) => {
           mensaje: data
         });
       }catch (error) {
-        return res.status(500).json({
-          ok: false,
-          mensaje: 'Error al eliminar el registro',
-          errors: error
-        });
+        next(error)
       }
 });
 

@@ -6,18 +6,21 @@
 const { Router } = require('express');
 const { crearExperiencia, actualizarExperiencia, eliminarExperiencia } = require('../Controladores/experiencia.controller');
 const { check } = require('express-validator');
-const { validarCampos } = require('../middlewares/fieldValidator.middleware')
+const { validarCampos } = require('../middlewares/fieldValidator.middleware');
+const { validarJWT } = require('../middlewares/jwt.middleware');
 const router = Router();
 
 //////////
 // Post
 //////////
 router.post('/',[
+  validarJWT,
   check('Puesto','El campos Puesto es un campo obligatorio').not().isEmpty(),
   check('FechaInicial','El campos FechaInicial es un campo obligatorio').not().isEmpty(),
   check('IdDoctor','El campos IdDoctor es un campo obligatorio').not().isEmpty(),
   validarCampos
-],async (req, res) => {
+],async (req, res, next) => {
+  console.log('\x1b[36m%s\x1b[0m','POST /api/doctores/experiencias')
     var body = req.body;
   
     try {
@@ -28,19 +31,15 @@ router.post('/',[
           mensaje: data
         });
       }catch (error) {
-        console.log(error);
-        return res.status(500).json({
-          ok: false,
-          mensaje: 'Error al insertar el nuevo registro',
-          errors: error
-        });
+        next(error)
       }
 });
   
 //////////
 // Put
 //////////
-router.put('/:IdExperiencia/doctor/:IdDoctor', async (req, res) => {
+router.put('/:IdExperiencia/doctor/:IdDoctor',validarJWT, async (req, res, next) => {
+  console.log('\x1b[36m%s\x1b[0m','PUT /api/doctores/experiencias')
     var body = req.body;
     var params = req.params;
   
@@ -53,18 +52,15 @@ router.put('/:IdExperiencia/doctor/:IdDoctor', async (req, res) => {
           mensaje: data
         });
       }catch (error) {
-        return res.status(500).json({
-          ok: false,
-          mensaje: 'Error al insertar el nuevo registro',
-          errors: error
-        });
+        next(error)
       }
   });
 
 //////////
 // Delete
 //////////
-router.delete('/:IdExperiencia/doctor/:IdDoctor', async (req, res) => {
+router.delete('/:IdExperiencia/doctor/:IdDoctor',validarJWT, async (req, res, next) => {
+    console.log('\x1b[36m%s\x1b[0m','DELETE /api/doctores/experiencias')
     var params = req.params;
 
     try {
@@ -75,11 +71,7 @@ router.delete('/:IdExperiencia/doctor/:IdDoctor', async (req, res) => {
           mensaje: data
         });
       }catch (error) {
-        return res.status(500).json({
-          ok: false,
-          mensaje: 'Error al insertar el nuevo registro',
-          errors: error
-        });
+        next(error)
       }
 });
 

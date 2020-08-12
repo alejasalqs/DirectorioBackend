@@ -11,14 +11,14 @@ const autenticaLogin = async (objeto) => {
   try{
     let data = await storeProcedure('AutorizarLoginDoctor', { Correo: correo });
 
-    data = await parseStringToJson(data[0])
-
-    if (data[1] === 0) {
+    if (data.length === 0) {
       return {
         ok: false,
         mensaje: 'Credenciales incorrectas - email',
       };
     }
+
+    data = await parseStringToJson(data[0])
 
     validPassword = bcrypt.compareSync(contrasena,data.Contrasena)
   
@@ -26,7 +26,6 @@ const autenticaLogin = async (objeto) => {
       return {
         ok: false,
         mensaje: 'Credenciales incorrectas - password',
-        //errors: err,
       };
     }
   
@@ -39,7 +38,7 @@ const autenticaLogin = async (objeto) => {
       token,
     };
   }catch(error){
-    console.log(error);
+    throw new Error(error);
   }
 }
 
@@ -56,7 +55,6 @@ const cambiarContraseña = async (objeto) => {
       return {
         ok: false,
         mensaje: 'La contraseña ingresada es incorrecta',
-        //errors: err,
       };
     }
 
@@ -70,7 +68,7 @@ const cambiarContraseña = async (objeto) => {
       mensaje: 'Se ha cambiado la contraseña éxitosamente'
     }
   }catch (error) {
-    console.log(error);
+    throw new Error(error);
   }
 }
 
@@ -82,7 +80,6 @@ const recuperarContrasena = async (correo) => {
       return {
         ok: false,
         mensaje: 'No existe un usuario con el correo ingresado',
-        //errors: err,
       };
     }
 
@@ -99,7 +96,7 @@ const recuperarContrasena = async (correo) => {
       contrasenaTemp: nuevaContrasena
     }
   } catch (err) {
-    console.log(err);
+    throw new Error(error);
   }
 }
 

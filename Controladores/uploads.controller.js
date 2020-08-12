@@ -10,7 +10,7 @@ const fileUpload = async (tipo,id,nombreArchivo) => {
         return false;
     }
 
-    const pathViejo = `./Uploads/${tipo}/${data[0].Foto}`;
+    const pathViejo = `./Uploads/${tipo}/${data[0].Foto || 'none'}`;
     if( fs.existsSync(pathViejo)){
         fs.unlinkSync(pathViejo);
     }

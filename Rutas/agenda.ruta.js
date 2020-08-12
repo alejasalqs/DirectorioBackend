@@ -6,6 +6,7 @@
 const { Router } = require('express');
 const { obtenerEventosAgenda, actualizarEventoAgenda, agregarEventoAgenda,llenarDatosAgenda,insertarDetalleEvento, obtenerEventosAgendados } = require('../Controladores/agenda.controller');
 const { validarJWT, verificarToken } = require('../middlewares/jwt.middleware');
+const { darFormatoFechaDDMMYYYY } = require('../Utilidades/fechas.utils');
 
 const router = Router();
 
@@ -13,7 +14,8 @@ const router = Router();
 // Get
 //////////
 router.get('/:id', [verificarToken], async (req, res) => {
-  var id = req.params.id;  
+  var id = req.params.id;
+  console.log('\x1b[36m%s\x1b[0m','GET /api/agenda/' + id)  
   try {
     let data;
     if(req.enviarAgendado === 1){
@@ -40,29 +42,34 @@ router.get('/:id', [verificarToken], async (req, res) => {
 //////////
 // Post
 //////////
-router.post('/llenardatos',[validarJWT], async (req, res) => {
-  var body = req.body;
-
+router.post('/llenardatos', async (req, res, next) => {
+  console.log('\x1b[36m%s\x1b[0m','POST /api/agenda')
+  var body = req.body.params;
   try {
-    const data = await llenarDatosAgenda(body);
+    delete body.Dias;
+
+    delete body.Hora;
+
+    let data = await darFormatoFechaDDMMYYYY(body);
+
+    console.log(body);
+    
+    data = await llenarDatosAgenda(body);
     
     return res.status(201).json({ 
       ok: true,
       mensaje: data
     });
   }catch (error) {
-    return res.status(500).json({
-      ok: false,
-      mensaje: 'Error al insertar el nuevo registro',
-      errors: error
-    });
+    next(error);
   }
 });
 
 //////////
 // Post
 //////////
-router.post('/', async (req, res) => {
+router.post('/', async (req, res, next) => {
+  console.log('\x1b[36m%s\x1b[0m','PUT /api/agenda')
   var body = req.body;
 
   try {
@@ -73,21 +80,17 @@ router.post('/', async (req, res) => {
       mensaje: data
     });
   }catch (error) {
-    return res.status(500).json({
-      ok: false,
-      mensaje: 'Error al insertar el nuevo registro',
-      errors: error
-    });
+    next(error)
   }
 });
 
 //////////
 // Put
 //////////
-router.put('/:id', async (req, res) => {
+router.put('/:id', async (req, res, next) => {
   var body = req.body;
   var id = req.params.id;
-  console.log('\x1b[36m%s\x1b[0m','GET /api/agenda/' + id)
+  console.log('\x1b[36m%s\x1b[0m','PUT /api/agenda/' + id)
 
   try {
     const data = await actualizarEventoAgenda(id, body.IdDoctor);
@@ -99,11 +102,7 @@ router.put('/:id', async (req, res) => {
       mensaje: data
     });
   }catch (error) {
-    return res.status(500).json({
-      ok: false,
-      mensaje: 'Error al recuperar la información',
-      errors: error
-    });
+    next(error)
   }
 });
 

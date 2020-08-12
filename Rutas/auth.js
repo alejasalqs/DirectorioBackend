@@ -16,7 +16,8 @@ router.post('/login',[
   check('correo','El campo correo debe ser un correo válido').isEmail(),
   check('contrasena','El campo contraseña es obligatorio').not().isEmpty(),
   validarCampos
-],async (req, res) => {
+],async (req, res, next) => {
+  console.log('\x1b[36m%s\x1b[0m','POST /api/auth/login')
   var body = req.body;
 
   try {
@@ -28,11 +29,7 @@ router.post('/login',[
       return res.status(401).json(data);
     }
   }catch (error) {
-    return res.status(500).json({
-      ok: false,
-      mensaje: 'Error al validar los datos',
-      errors: error
-    });
+    next(error)
   }
 });
 
@@ -42,7 +39,8 @@ router.post('/cambiarcontrasena',[
   check('Contrasena','El campo contraseña es obligatorio').not().isEmpty(),
   check('NuevaContrasena','El campo contraseña es obligatorio').not().isEmpty(),
   validarCampos
-],async (req, res) => {
+],async (req, res, next) => {
+  console.log('\x1b[36m%s\x1b[0m','POST /api/auth/cambiarcontrasena')
   var body = req.body;
 
   try {
@@ -54,11 +52,7 @@ router.post('/cambiarcontrasena',[
       return res.status(400).json(data);
     }
   }catch (error) {
-    return res.status(500).json({
-      ok: false,
-      mensaje: 'Error al validar los datos',
-      errors: error
-    });
+    next(error)
   }
 });
 
@@ -66,7 +60,8 @@ router.post('/recuperarcontrasena',[
   check('Correo','El campo correo es obligatorio').not().isEmpty(),
   check('Correo','El campo correo debe ser un correo válido').isEmail(),
   validarCampos
-],async (req, res) => {
+],async (req, res, next) => {
+  console.log('\x1b[36m%s\x1b[0m','POST /api/auth/recuperarcontrasena')
   var body = req.body;
 
   try {
@@ -78,18 +73,19 @@ router.post('/recuperarcontrasena',[
       return res.status(400).json(data);
     }
   }catch (error) {
-    return res.status(500).json({
-      ok: false,
-      mensaje: 'Error al validar los datos',
-      errors: error
-    });
+    next(error)
   }
 });
 
-router.post('/ultimoingreso', async (req, res) => {
-  const data = await storeProcedure('ActualizarUltimoIngreso',{Correo: req.body.Correo});
+router.post('/ultimoingreso', async (req, res, next) => {
+  try {
+    console.log('\x1b[36m%s\x1b[0m','POST /api/auth/ultimoingreso')
+    const data = await storeProcedure('ActualizarUltimoIngreso',{Correo: req.body.Correo});
 
-  return res.json({ok: true});
+    return res.json({ok: true});
+  } catch (error) {
+    next(error)
+  }
 });
 
 module.exports = router;

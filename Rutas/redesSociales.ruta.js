@@ -7,6 +7,7 @@ const { Router } = require('express');
 const { crearRedSocial, actualizarRedSocial, eliminarRedSocial  } = require('../Controladores/redesSociales.controller');
 const { validarCampos } = require('../middlewares/fieldValidator.middleware')
 const { check } = require('express-validator');
+const { validarJWT } = require('../middlewares/jwt.middleware');
 
 const router = Router();
 
@@ -17,8 +18,10 @@ router.post('/', [
   check('url', 'El campo url es obligatorio').not().isEmpty(),
   check('IdDoctor', 'El campo IdDoctor debe ser un identificador tipo INT válido').isNumeric(),
   check('descripcion', 'El campo descripcion es obligatorio').not().isEmpty(),
-  validarCampos
-], async (req, res) => {
+  validarCampos,
+  validarJWT
+], async (req, res, next) => {
+  console.log('\x1b[36m%s\x1b[0m','POST /api/doctores/redesSociales')
     var body = req.body;
      
     try {
@@ -29,18 +32,15 @@ router.post('/', [
           mensaje: data
         });
       }catch (error) {
-        return res.status(500).json({
-          ok: false,
-          mensaje: 'Error al insertar el nuevo registro',
-          errors: error
-        });
+        next(error)
       }
   });
 
 //////////
 // Put
 //////////
-router.put('/:IdRedesSociales/doctor/:IdDoctor', async (req, res) => {
+router.put('/:IdRedesSociales/doctor/:IdDoctor', validarJWT,async (req, res, next) => {
+  console.log('\x1b[36m%s\x1b[0m','PUT /api/doctores/redesSociales')
     var body = req.body;
     var params = req.params;
   
@@ -52,18 +52,15 @@ router.put('/:IdRedesSociales/doctor/:IdDoctor', async (req, res) => {
           mensaje: data
         });
       }catch (error) {
-        return res.status(500).json({
-          ok: false,
-          mensaje: 'Error al actualizar el nuevo registro',
-          errors: error
-        });
+        next(error)
       }
 });
 
 //////////
 // Delete
 //////////
-router.delete('/:IdRedesSociales/doctor/:IdDoctor', async (req, res) => {
+router.delete('/:IdRedesSociales/doctor/:IdDoctor', validarJWT,async (req, res, next) => {
+    console.log('\x1b[36m%s\x1b[0m','PUT /api/doctores/redesSociales')
     var params = req.params;
   
     try {
@@ -74,11 +71,7 @@ router.delete('/:IdRedesSociales/doctor/:IdDoctor', async (req, res) => {
           mensaje: data
         });
       }catch (error) {
-        return res.status(500).json({
-          ok: false,
-          mensaje: 'Error al insertar el nuevo registro',
-          errors: error
-        });
+        next(error)
       }
   });
 

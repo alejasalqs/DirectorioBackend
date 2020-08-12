@@ -13,7 +13,7 @@ const darFormatoFechaDDMMYYYY = async (obj) => {
         }  
         return obj;
     } catch (err) {
-        console.log(err);
+        throw new Error(err);
     }
 }
 

@@ -7,6 +7,7 @@ const { Router } = require('express');
 const expressFileUpload = require('express-fileupload');
 const { fileUpload,retornaImg } = require('../Controladores/uploads.controller');
 const { v4: uuidv4 } = require('uuid');
+const { validarJWT } = require('../middlewares/jwt.middleware');
 
 const router = Router();
 
@@ -21,7 +22,8 @@ router.get('/:tipo/:foto', async (req,res) => {
     return res.sendFile(img);
 })
 
-router.put('/:tipo/:id', async (req, res) => {
+router.put('/:tipo/:id', validarJWT,async (req, res, next) => {
+    console.log('\x1b[36m%s\x1b[0m','PUT /api/uploads')
     try {
         const { tipo, id } = req.params;
 
@@ -83,7 +85,7 @@ router.put('/:tipo/:id', async (req, res) => {
             })
         })
     } catch(err) {
-        console.log(err)
+        next(error)
     }
 });
 

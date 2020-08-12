@@ -6,6 +6,11 @@ module.exports = {
     DB_HOST: '127.0.0.1',
     DB_INSTANCE_NAME: 'MSSQLSERVER',
   },
+  correo: {
+    USER: '',
+    PASS: '',
+    FROM: ''
+  }
 };
 
 module.exports.SEED = 'argus-backend-seed';

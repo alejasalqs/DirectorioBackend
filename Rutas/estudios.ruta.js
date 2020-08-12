@@ -7,6 +7,7 @@ const { Router } = require('express');
 const { crearEstudio, actualizarEstudio, eliminarEstudio  } = require('../Controladores/estudios.controller');
 const { check } = require('express-validator');
 const { validarCampos } = require('../middlewares/fieldValidator.middleware');
+const { validarJWT } = require('../middlewares/jwt.middleware');
 
 const router = Router();
 
@@ -14,11 +15,13 @@ const router = Router();
 // Post
 //////////
 router.post('/',[
+  validarJWT,
   check('Grado','El campo grado es campo obligatorio').not().isEmpty(),
   check('FechaInicial','El campo FechaInicial es campo obligatorio').not().isEmpty(),
   check('IdDoctor','El campo IdDoctor es campo obligatorio').not().isEmpty(),
   validarCampos
-],async (req, res) => {
+],async (req, res, next) => {
+    console.log('\x1b[36m%s\x1b[0m','POST /api/doctores/estudios')
     var body = req.body;
   
     try {
@@ -29,18 +32,15 @@ router.post('/',[
           mensaje: data
         });
       }catch (error) {
-        return res.status(500).json({
-          ok: false,
-          mensaje: 'Error al insertar el nuevo registro',
-          errors: error
-        });
+        next(error)
       }
   });
   
   //////////
   // Put
   //////////
-  router.put('/:IdEstudio/doctor/:IdDoctor', async (req, res) => {
+  router.put('/:IdEstudio/doctor/:IdDoctor',validarJWT, async (req, res, next) => {
+    console.log('\x1b[36m%s\x1b[0m','PUT /api/doctores/estudios')
     var body = req.body;
     var params = req.params;
   
@@ -52,18 +52,15 @@ router.post('/',[
           mensaje: data
         });
       }catch (error) {
-        return res.status(500).json({
-          ok: false,
-          mensaje: 'Error al insertar el nuevo registro',
-          errors: error
-        });
+        next(error)
       }
   });
 
   //////////
   // Delete
   //////////
-  router.delete('/:IdEstudio/doctor/:IdDoctor', async (req, res) => {
+  router.delete('/:IdEstudio/doctor/:IdDoctor', validarJWT,async (req, res, next) => {
+    console.log('\x1b[36m%s\x1b[0m','DELETE /api/doctores/estudios')
     var params = req.params;
   
     try {
@@ -74,11 +71,7 @@ router.post('/',[
           mensaje: data
         });
       }catch (error) {
-        return res.status(500).json({
-          ok: false,
-          mensaje: 'Error al eliminar registro',
-          errors: error
-        });
+        next(error)
       }
   });
 

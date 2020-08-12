@@ -19,9 +19,11 @@ router.post('/',
   check('IdDoctor', 'El campo IdDoctor es obligatorio').not().isEmpty(),
   check('IdDoctor', 'El campo IdDoctor debe ser un identificador tipo INT válido').isNumeric(),
   check('descripcion', 'El campo descripcion es obligatorio').not().isEmpty(),
-  validarCampos
+  validarCampos,
+  validarJWT
 ],
- async (req, res) => {
+ async (req, res, next) => {
+    console.log('\x1b[36m%s\x1b[0m','POST /api/doctores/especialidades')
     var body = req.body;
 
     try {
@@ -32,11 +34,7 @@ router.post('/',
           mensaje: data
         });
       }catch (error) {
-        return res.status(500).json({
-          ok: false,
-          mensaje: 'Error al insertar el nuevo registro',
-          errors: error
-        });
+        next(error)
       }
 });
 
@@ -46,9 +44,11 @@ router.post('/',
 router.put('/:idespecialidad/doctor/:doctorid',
 [
   check('descripcion', 'El campo descripcion es obligatorio').not().isEmpty(),
-  validarCampos
+  validarCampos,
+  validarJWT
 ], 
-async (req, res) => {
+async (req, res, next) => {
+  console.log('\x1b[36m%s\x1b[0m','PUT /api/doctores/especialidades')
     var body = req.body;
     var params = req.params;
 
@@ -60,18 +60,15 @@ async (req, res) => {
           mensaje: data
         });
       }catch (error) {
-        return res.status(500).json({
-          ok: false,
-          mensaje: 'Error al eliminar el registro',
-          errors: error
-        });
+        next(error)
       }
   });
 
 //////////
 // Delete
 //////////
-router.delete('/:idespecialidad/doctor/:IdDoctor',async (req, res) => {
+router.delete('/:idespecialidad/doctor/:IdDoctor',validarJWT,async (req, res, next) => {
+  console.log('\x1b[36m%s\x1b[0m','DELETE /api/doctores/especialidades')
     var params = req.params;
   
     try {
@@ -82,11 +79,7 @@ router.delete('/:idespecialidad/doctor/:IdDoctor',async (req, res) => {
           mensaje: data
         });
       }catch (error) {
-        return res.status(500).json({
-          ok: false,
-          mensaje: 'Error al insertar el nuevo registro',
-          errors: error
-        });
+        next(error)
       }
   });
 

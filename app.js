@@ -13,6 +13,19 @@ app.use(cors())
 // Lectura y parseo del body
 app.use(express.json());
 
+app.listen(3000, () => {
+  console.log('🚀 Express server corriendo en el puerto 3000');
+});
+
+// Se instancia la base de datos
+db.sequelize.authenticate()
+  .then(() => {
+    console.log('Se ha conectado correctamenta a la Base de datos.');
+  })
+  .catch((err) => {
+    console.error('Imposible conectarse a la Base de datos:', err);
+  });
+
 // Rutas
 // Rutas - Autenticaciones
 app.use('/api/auth', require('./Rutas/auth'))
@@ -28,15 +41,14 @@ app.use('/api/agenda', require('./Rutas/agenda.ruta'))
 // Rutas -  Subir Archivo
 app.use('/api/uploads', require('./Rutas/uploads.route'))
 
-app.listen(3000, () => {
-  console.log('Express server corriendo en el puerto 3000');
+// Manejo de Errores
+app.use((err, req, res, next) => {
+  console.log('\x1b[31m%s\x1b[0m', '[ERROR] ' + err.message)
+  let log = {
+    Mensaje:      err.message ? err.message.substr(0, 500) : 'Error desconocido',
+    Descripcion:  err.stack ? err.stack.substr(0, 500) : '',
+    Codigo_Error: err.code || -1,
+    Fecha:        new Date()
+  }
+  return res.status(500).json({ ok: false, mensaje: err.message, log });
 });
-
-// Se instancia la base de datos
-db.sequelize.authenticate()
-  .then(() => {
-    console.log('Se ha conectado correctamenta a la Base de datos.');
-  })
-  .catch((err) => {
-    console.error('Imposible conectarse a la Base de datos:', err);
-  });

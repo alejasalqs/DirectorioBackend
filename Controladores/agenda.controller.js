@@ -52,12 +52,6 @@ const agregarEventoAgenda = async (objeto) => {
 const actualizarEventoAgenda = async (id,objeto) => {
 
   const data = await storeProcedure('ActualizarEventoAgenda',{IdAgenda: id, IdDoctor : objeto })
-
-  const correo = await enviarEmail({
-    Destinatario: 'alesalgueroq1223@gmail.com',
-    Asunto: 'Agendación de cita',
-    Informacion: 'Test de envio de correo'
-  })
     
   return data[0];
 }
@@ -66,6 +60,14 @@ const insertarDetalleEvento = async (id,objeto) => {
   objeto.IdAgenda = id;
   delete objeto.IdDoctor;
   const data = await storeProcedure('InsertarDetalleEvento',objeto)
+
+  const correo = await enviarEmail({
+    Destinatario: objeto.Correo,
+    Asunto: 'Agendación de cita',
+    Informacion: 'Test de envio de correo'
+  })
+
+  console.log(correo);
     
   return data[0];
 }

@@ -4,14 +4,15 @@
 
 */
 const { Router } = require('express');
-const { obtenerDoctores, obtenerDoctorPorID, crearDoctor,actualizarDoctor, eliminarDoctor } = require('../Controladores/doctores.controller');
+const { obtenerDoctores, obtenerDoctorPorID, crearDoctor,actualizarDoctor, eliminarDoctor,obtenerNombreDoctores } = require('../Controladores/doctores.controller');
+const { validarJWT } = require('../middlewares/jwt.middleware');
 
 const router = Router();
 
 //////////
 // Get
 //////////
-router.get('/', async (req, res) => {
+router.get('/', async (req, res, next) => {
   console.log('\x1b[36m%s\x1b[0m','GET /api/doctores')
   try {
     const data = await obtenerDoctores(req.query);
@@ -21,18 +22,31 @@ router.get('/', async (req, res) => {
       doctores: data
     });
   }catch (error) {
-    return res.status(500).json({
-      ok: false,
-      mensaje: 'Error al recuperar la información',
-      errors: error
+    next(error)
+  }
+});
+
+//////////
+// Get
+//////////
+router.get('/nombres', async (req, res, next) => {
+  console.log('\x1b[36m%s\x1b[0m','GET /api/doctores/nombres')
+  try {
+    const data = await obtenerNombreDoctores();
+    
+    return res.status(200).json({
+      ok: true,
+      doctores: data
     });
+  }catch (error) {
+    next(error)
   }
 });
 
 //////////
 // Get/:id
 //////////
-router.get('/:id', async (req, res) => {
+router.get('/:id', async (req, res, next) => {
   var id = req.params.id;
   console.log('\x1b[36m%s\x1b[0m','GET /api/doctores/' + id)
   try {
@@ -43,18 +57,14 @@ router.get('/:id', async (req, res) => {
       doctor: data
     });
   }catch (error) {
-    return res.status(500).json({
-      ok: false,
-      mensaje: 'Error al recuperar la información',
-      errors: error
-    });
+    next(error)
   }
 });
 
 //////////
 // Post
 //////////
-router.post('/', async (req, res) => {
+router.post('/', async (req, res, next) => {
   console.log('\x1b[36m%s\x1b[0m','POST /api/doctores')
   var body = req.body;
 
@@ -66,21 +76,18 @@ router.post('/', async (req, res) => {
       mensaje: data
     });
   }catch (error) {
-    return res.status(500).json({
-      ok: false,
-      mensaje: 'Error al insertar el nuevo registro',
-      errors: error
-    });
+    next(error)
   }
 });
 
 //////////
 // Put
 //////////
-router.put('/:id', async (req, res) => {
+router.put('/:id', validarJWT, async (req, res, next) => {
   var id = req.params.id;
   var body = req.body;
   console.log('\x1b[36m%s\x1b[0m','PUT /api/doctores/' + id)
+  console.log(body)
 
   try {
     const data = await actualizarDoctor(id,body);
@@ -90,18 +97,14 @@ router.put('/:id', async (req, res) => {
       mensaje: data
     });
   }catch (error) {
-    return res.status(500).json({
-      ok: false,
-      mensaje: 'Error al actualizar el registro',
-      errors: error
-    });
+    next(error)
   }
 });
 
 //////////
 // Delete
 //////////
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', validarJWT, async (req, res, next) => {
   var id = req.params.id;
   console.log('\x1b[36m%s\x1b[0m','DELETE /api/doctores/' + id)
   try {
@@ -112,11 +115,7 @@ router.delete('/:id', async (req, res) => {
       mensaje: data
     });
   }catch (error) {
-    return res.status(500).json({
-      ok: false,
-      mensaje: 'Error al realizar la operación',
-      errors: error
-    });
+    next(error)
   }
 });
 
