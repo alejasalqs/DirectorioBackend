@@ -4,6 +4,7 @@ const SEED = require('../Data/config').SEED;
 const { parseStringToJson, generarStringRandom } = require('../Utilidades/string.utils');
 const { storeProcedure } = require('../Utilidades/db.utils');
 const { generarJWT } = require('../Helpers/jwt.helpers');
+const { enviarEmail } = require('../Helpers/email.helpers');
 
 const autenticaLogin = async (objeto) => {
   const { correo, contrasena } = objeto
@@ -89,6 +90,8 @@ const recuperarContrasena = async (correo) => {
     nuevaContrasenaEncriptar = bcrypt.hashSync(nuevaContrasena,salt);
 
     let data = await storeProcedure('ActualizarContrasena', { NuevaContrasena : nuevaContrasenaEncriptar, Correo: correo });
+
+    let correo = await enviarEmail().catch();
 
     return {
       ok: true,

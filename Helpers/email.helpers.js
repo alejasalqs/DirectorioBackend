@@ -1,20 +1,38 @@
 const nodemailer = require('nodemailer');
+const handlebars = require('handlebars');
+const { readHTMLFile } = require('../Utilidades/file.utils');
+const { correo } = require('../Data/config');
 
-const enviarEmail = async (datos) => {
+const enviarEmail = async (datos, plantilla) => {
     // Definimos el transporter
-    var transporter = nodemailer.createTransport({
+    const transporter = nodemailer.createTransport({
         service: 'Hotmail',
         auth: {
             user: 'alejandrosalgueroq@hotmail.com',
             pass: 'pokemon987654321'
         }
     });
+
+   const html = await readHTMLFile('../Templates/agendacionCita.template.html').catch(err => console.log(err));
+
+   const template = handlebars.compile(html);
+
+   const replacements = {
+        Nombre: datos.NombreCompleto,
+        Cedula: datos.cedula,
+        Correo: datos.correo,
+        Correo: datos.celular,
+        Inicio:datos.Inicio,
+        Fin:datos.Final,
+        MotivoCita:datos.MotivoCita
+    };
+    const htmlToSend = template(replacements);
     // Definimos el email
-    var mailOptions = {
+    const mailOptions = {
         from: '"Alejandro Salguero 👻" <alejandrosalgueroq@hotmail.com>',
-        to: datos.Destinatario,
-        subject: datos.Asunto,
-        text: datos.Informacion
+        to: 'alesalgueroq1223@gmail.com',
+        subject: 'Agendación cita médica',
+        html : htmlToSend
     };
     // Enviamos el email
     transporter.sendMail(mailOptions, function(error, info){

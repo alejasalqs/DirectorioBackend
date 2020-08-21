@@ -2,6 +2,7 @@ var db = require('../Data/database');
 const { storeProcedure } = require('../Utilidades/db.utils');
 const { darFormatoFechaDDMMYYYY } = require('../Utilidades/fechas.utils');
 const { enviarEmail } = require('../Helpers/email.helpers');
+const { enviarMensajeWP, enviarMensajeSMS } = require('../Helpers/whatsApp.helpers');
 
 /**
    * Obtiene todos los eventos de la agenda de un doctor especificado por ID.
@@ -36,7 +37,7 @@ const obtenerEventosAgenda = async (id) => {
 
 const llenarDatosAgenda = async (objeto) => {
 
-  let data = await darFormatoFechaDDMMYYYY(objeto);
+  let data;// = await darFormatoFechaDDMMYYYY(objeto);
   
   data = await storeProcedure('LlenarFechas', objeto);
     
@@ -61,14 +62,12 @@ const insertarDetalleEvento = async (id,objeto) => {
   delete objeto.IdDoctor;
   const data = await storeProcedure('InsertarDetalleEvento',objeto)
 
-  const correo = await enviarEmail({
-    Destinatario: objeto.Correo,
-    Asunto: 'Agendación de cita',
-    Informacion: 'Test de envio de correo'
-  })
+  const correo = await enviarEmail(data[0])
 
-  console.log(correo);
-    
+  const wp = await enviarMensajeWP(data[0]);
+
+  const sms = await enviarMensajeSMS(data[0])
+  
   return data[0];
 }
 

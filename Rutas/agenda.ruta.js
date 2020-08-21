@@ -46,11 +46,12 @@ router.post('/llenardatos', async (req, res, next) => {
   console.log('\x1b[36m%s\x1b[0m','POST /api/agenda')
   var body = req.body.params;
   try {
-    delete body.Dias;
+    console.log(body)
+   // delete body.Dias;
 
     delete body.Hora;
 
-    let data = await darFormatoFechaDDMMYYYY(body);
+    let data;// = await darFormatoFechaDDMMYYYY(body);
 
     console.log(body);
     

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <title>Agendación cita</title>
+</head>
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="col">
+                <h1>¡Hola!</h1>
+                <h3>Por este medio te informamos que tienes una cita agenda para: {{Fecha}} </h3>
+            </div>
+            <br>
+            <h3>Estos son algunos datos que te podrían interesar:</h3>
+            <hr>
+            <table class="table">
+                <tbody>
+                  <tr>
+                    <td><strong>Nombre:</strong></td>
+                    <td><strong>Cédula:</strong></td>
+                    <td><strong>Correo:</strong></td>
+                    <td><strong>Celular:</strong></td>
+                    <td><strong>Fecha Inicio:</strong></td>
+                    <td><strong>Fecha Fin:</strong></td>
+                    <td><strong>Motivo Cita:</strong></td>
+                  </tr>
+                  <tr>
+                    <td>{{Nombre}}</td>
+                    <td>{{Cedula}}</td>
+                    <td>{{Correo}}</td>
+                    <td>{{Celular}}</td>
+                    <td>{{Inicio}}</td>
+                    <td>{{Fin}}</td>
+                    <td>{{MotivoCita}}</td>
+                  </tr>
+                </tbody>
+              </table>
+        </div>
+    </div>
+</body>
+</html>
