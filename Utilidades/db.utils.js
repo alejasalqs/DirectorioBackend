@@ -20,6 +20,7 @@ const storeProcedure = async (nombre, parametros) => {
           throw new Error ('Error al ejecutar operación en la Base de Datos: ' + err) 
       })
   
+      console.log(data);
       return data[0];
   }
 

@@ -3,6 +3,7 @@ const { storeProcedure } = require('../Utilidades/db.utils');
 const { darFormatoFechaDDMMYYYY } = require('../Utilidades/fechas.utils');
 const { enviarEmail } = require('../Helpers/email.helpers');
 const { enviarMensajeWP, enviarMensajeSMS } = require('../Helpers/whatsApp.helpers');
+var moment = require('moment'); // require
 
 /**
    * Obtiene todos los eventos de la agenda de un doctor especificado por ID.
@@ -36,12 +37,40 @@ const obtenerEventosAgenda = async (id) => {
 }
 
 const llenarDatosAgenda = async (objeto) => {
-
-  let data;// = await darFormatoFechaDDMMYYYY(objeto);
   
-  data = await storeProcedure('LlenarFechas', objeto);
+  let data = await darFormatoFechaDDMMYYYY(objeto);
+
+  let dias = await storeProcedure('ObtenerDiasLaborales',{ IdDoctor: objeto.IdDoctor })
+
+  dias = dias.map(d => d.Dia.toLowerCase());
+
+  let inicio = moment(data.FechaInicial, 'YYYY-MM-DD HH:mm').format("YYYY-MM-DD HH:mm");
+  let final = moment(data.FechaFinal, 'YYYY-MM-DD HH:mm').format("YYYY-MM-DD HH:mm");
+
+  while(moment(inicio).isBefore(final,'day')) {
+    for (let i = 0; i <= parseInt(objeto.HorasLaborales); i++) {
+      console.log(i <= parseInt(objeto.HorasLaborales))
+      console.log(i)
+      finCita =  moment(inicio, "YYYY-MM-DD HH:mm").add(1, 'h').format("YYYY-MM-DD HH:mm").toString();
+
+      if (!dias.includes(moment(inicio).locale('es').format('dddd'))) {
+        console.log(moment(inicio).locale('es').format('dddd'))
+        break;
+      }
+      
+      const data = await storeProcedure('AgregarEventoAgenda', {
+        start: inicio,
+        endDate: finCita,
+        title: `Espacio disponible: ${moment(inicio).hour()}-${moment(finCita).hour()}`,
+        IdDoctor: objeto.IdDoctor
+      })
+      inicio = finCita;
+    }
+    inicio = moment(inicio).hour( moment(data.FechaInicial).hour() );
+    inicio = moment(inicio, "YYYY-MM-DD HH:mm").add(1, 'd').format("YYYY-MM-DD HH:mm");
+  }
     
-  return data[0];
+  return "data[0]";
 }
 
 const agregarEventoAgenda = async (objeto) => {
@@ -71,11 +100,22 @@ const insertarDetalleEvento = async (id,objeto) => {
   return data[0];
 }
 
+
+const configurarDiasLaborales = async (dias) => {
+  const data = await Promise.all(dias.map(async d => {
+      let dia = await storeProcedure('ConfigurarDias', d)
+    }
+  )).catch(err => {throw new Error(err)});
+
+  return data[0];
+} 
+
 module.exports = {
     obtenerEventosAgenda,
     agregarEventoAgenda,
     actualizarEventoAgenda,
     llenarDatosAgenda,
     insertarDetalleEvento,
-    obtenerEventosAgendados
+    obtenerEventosAgendados,
+    configurarDiasLaborales
 }

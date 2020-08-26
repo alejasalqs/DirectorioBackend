@@ -4,7 +4,7 @@
 
 */
 const { Router } = require('express');
-const { obtenerEventosAgenda, actualizarEventoAgenda, agregarEventoAgenda,llenarDatosAgenda,insertarDetalleEvento, obtenerEventosAgendados } = require('../Controladores/agenda.controller');
+const { obtenerEventosAgenda, actualizarEventoAgenda, agregarEventoAgenda,llenarDatosAgenda,insertarDetalleEvento, obtenerEventosAgendados, configurarDiasLaborales } = require('../Controladores/agenda.controller');
 const { validarJWT, verificarToken } = require('../middlewares/jwt.middleware');
 const { darFormatoFechaDDMMYYYY } = require('../Utilidades/fechas.utils');
 
@@ -43,19 +43,17 @@ router.get('/:id', [verificarToken], async (req, res) => {
 // Post
 //////////
 router.post('/llenardatos', async (req, res, next) => {
-  console.log('\x1b[36m%s\x1b[0m','POST /api/agenda')
-  var body = req.body.params;
+  console.log('\x1b[36m%s\x1b[0m','POST /api/agenda/llenardatos')
+  var body = req.body;
   try {
     console.log(body)
    // delete body.Dias;
 
-    delete body.Hora;
+    // delete body.Hora;
 
     let data;// = await darFormatoFechaDDMMYYYY(body);
-
-    console.log(body);
     
-    data = await llenarDatosAgenda(body);
+    data = await llenarDatosAgenda(body.params);
     
     return res.status(201).json({ 
       ok: true,
@@ -99,6 +97,25 @@ router.put('/:id', async (req, res, next) => {
     const detail = await insertarDetalleEvento(id,body);
     
     return res.status(200).json({ 
+      ok: true,
+      mensaje: data
+    });
+  }catch (error) {
+    next(error)
+  }
+});
+
+//////////
+// Post
+//////////
+router.post('/dias', async (req, res, next) => {
+  console.log('\x1b[36m%s\x1b[0m','PUT /api/agenda/dias')
+  var body = req.body;
+
+  try {
+    const data = await configurarDiasLaborales(body);
+    
+    return res.status(201).json({ 
       ok: true,
       mensaje: data
     });

@@ -39,6 +39,7 @@ const parseStringToJson = async (obj) => {
     return str
 }
 
+
 const generarStringRandom = async (length) => {
     var result           = '';
     var characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
