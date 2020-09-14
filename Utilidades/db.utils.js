@@ -18,9 +18,8 @@ const storeProcedure = async (nombre, parametros) => {
   
       let data = await db.sequelize.query(`EXEC dbo.${nombre} ${reemplazarStringStoreProcedure(parametros)}`, opts).catch(err => {
           throw new Error ('Error al ejecutar operación en la Base de Datos: ' + err) 
-      })
+      });
   
-      console.log(data);
       return data[0];
   }
 

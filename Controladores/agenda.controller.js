@@ -21,6 +21,14 @@ const obtenerEventosAgenda = async (id) => {
 }
 
 
+const obtenerDetalleEventosAgenda = async (id) => {
+  let data = await storeProcedure('ObtenerDetalleEvento', { IdAgenda: id })
+  
+  data = await darFormatoFechaDDMMYYYY(data[0]);
+
+  return data;
+}
+
 /**
    * Obtiene todos los eventos de la agenda de un doctor especificado por ID.
    * 
@@ -44,17 +52,16 @@ const llenarDatosAgenda = async (objeto) => {
 
   dias = dias.map(d => d.Dia.toLowerCase());
 
+  console.log(dias)
+
   let inicio = moment(data.FechaInicial, 'YYYY-MM-DD HH:mm').format("YYYY-MM-DD HH:mm");
   let final = moment(data.FechaFinal, 'YYYY-MM-DD HH:mm').format("YYYY-MM-DD HH:mm");
 
   while(moment(inicio).isBefore(final,'day')) {
-    for (let i = 0; i <= parseInt(objeto.HorasLaborales); i++) {
-      console.log(i <= parseInt(objeto.HorasLaborales))
-      console.log(i)
+    for (let i = 1; i <= parseInt(objeto.HorasLaborales); i++) {
       finCita =  moment(inicio, "YYYY-MM-DD HH:mm").add(1, 'h').format("YYYY-MM-DD HH:mm").toString();
 
       if (!dias.includes(moment(inicio).locale('es').format('dddd'))) {
-        console.log(moment(inicio).locale('es').format('dddd'))
         break;
       }
       
@@ -91,7 +98,13 @@ const insertarDetalleEvento = async (id,objeto) => {
   delete objeto.IdDoctor;
   const data = await storeProcedure('InsertarDetalleEvento',objeto)
 
-  const correo = await enviarEmail(data[0])
+  let enviarACorreo = data[0].enviarACorreo;
+
+  let enviarACelular = data[0].enviarACelular;
+
+  delete data[0].enviarACorreo, data[0].enviarACelular;
+
+  const correo = await enviarEmail(data[0],'agendacionCita',"Agendación de nueva cita",enviarACorreo);
 
   const wp = await enviarMensajeWP(data[0]);
 
@@ -102,13 +115,32 @@ const insertarDetalleEvento = async (id,objeto) => {
 
 
 const configurarDiasLaborales = async (dias) => {
-  const data = await Promise.all(dias.map(async d => {
-      let dia = await storeProcedure('ConfigurarDias', d)
+
+  const diasBD = await storeProcedure('ObtenerDiasLaborales' , { IdDoctor: dias[0].IdDoctor});
+
+  console.log(diasBD.length)
+
+  let data;
+
+  if(diasBD.length !== 0) {
+    data = await Promise.all(dias.map(async d => {
+      let dia = await storeProcedure('ActualizarConfiguracionDias', d).catch(err => console.log(err))
+    })).catch(err => {throw new Error(err)});
+  } else {
+    data = await Promise.all(dias.map(async d => {
+      let dia = await storeProcedure('ConfigurarDias', d).catch(err => console.log(err))
     }
   )).catch(err => {throw new Error(err)});
+  }
 
   return data[0];
 } 
+
+const cancelarCitaAgenda = async (id) => {
+  const data = await storeProcedure('CancelarCita', {IdAgenda: id});
+
+  return data[0];
+}
 
 module.exports = {
     obtenerEventosAgenda,
@@ -117,5 +149,7 @@ module.exports = {
     llenarDatosAgenda,
     insertarDetalleEvento,
     obtenerEventosAgendados,
-    configurarDiasLaborales
+    configurarDiasLaborales,
+    obtenerDetalleEventosAgenda,
+    cancelarCitaAgenda
 }

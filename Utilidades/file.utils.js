@@ -15,6 +15,17 @@ const readHTMLFile = async (path) => {
     })
 };
 
+const descomponerDatosEmail = async (datos) => {
+    let obj = {};
+    console.log(datos)
+    for(let key of Object.keys(datos)) {
+       obj[key] = datos[key];
+    }
+
+    return obj;
+}
+
 module.exports = {
-    readHTMLFile
+    readHTMLFile,
+    descomponerDatosEmail
 }

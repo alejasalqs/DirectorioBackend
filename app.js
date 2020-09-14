@@ -3,6 +3,7 @@
 const express = require('express');
 const db = require('./Data/database');
 const cors = require('cors');
+const { enviarRecordatorioCita } = require('./Helpers/recordatorios.helpers')
 
 // Creamos el servidor
 var app = express();
@@ -26,6 +27,9 @@ db.sequelize.authenticate()
     console.error('Imposible conectarse a la Base de datos:', err);
   });
 
+
+  enviarRecordatorioCita();
+
 // Rutas
 // Rutas - Autenticaciones
 app.use('/api/auth', require('./Rutas/auth'))
@@ -40,6 +44,10 @@ app.use('/api/doctores/estudios', require('./Rutas/estudios.ruta'))
 app.use('/api/agenda', require('./Rutas/agenda.ruta'))
 // Rutas -  Subir Archivo
 app.use('/api/uploads', require('./Rutas/uploads.route'))
+// Rutas -  Subir Archivo
+app.use('/api/recordatorios', require('./Rutas/recordatorios.ruta'))
+// Rutas -  Subir Archivo
+app.use('/api/reportes', require('./Rutas/reportes.ruta'))
 
 // Manejo de Errores
 app.use((err, req, res, next) => {

@@ -4,7 +4,7 @@ const SEED = require('../Data/config').SEED;
 const { parseStringToJson, generarStringRandom } = require('../Utilidades/string.utils');
 const { storeProcedure } = require('../Utilidades/db.utils');
 const { generarJWT } = require('../Helpers/jwt.helpers');
-const { enviarEmail } = require('../Helpers/email.helpers');
+const { enviarEmail, enviarEmailCambioContrasena } = require('../Helpers/email.helpers');
 
 const autenticaLogin = async (objeto) => {
   const { correo, contrasena } = objeto
@@ -74,13 +74,14 @@ const cambiarContraseña = async (objeto) => {
 }
 
 const recuperarContrasena = async (correo) => {
+  let Correo = correo;
   try {
-    let usuario = await storeProcedure('AutorizarLoginDoctor', {Correo: correo });
+    let usuario = await storeProcedure('AutorizarLoginDoctor', { Correo });
 
-    if(!usuario){
+    if(usuario.length === 0){
       return {
         ok: false,
-        mensaje: 'No existe un usuario con el correo ingresado',
+        mensaje: 'El correo ingresado no existe',
       };
     }
 
@@ -89,17 +90,17 @@ const recuperarContrasena = async (correo) => {
     const salt = bcrypt.genSaltSync();
     nuevaContrasenaEncriptar = bcrypt.hashSync(nuevaContrasena,salt);
 
-    let data = await storeProcedure('ActualizarContrasena', { NuevaContrasena : nuevaContrasenaEncriptar, Correo: correo });
+    let data = await storeProcedure('ActualizarContrasena', { NuevaContrasena : nuevaContrasenaEncriptar, Correo });
 
-    let correo = await enviarEmail().catch();
+    let correo = await enviarEmail({nuevaContrasena},"cambioContrasena","Cambio en la contraseña del sistema Argus-salud", Correo);
 
     return {
       ok: true,
-      mensaje: 'Se le ha generado correctamente una contraseña temporal',
+      mensaje: 'Se le ha generado correctamente una contraseña temporal, por favor revise su correo para tener más información',
       contrasenaTemp: nuevaContrasena
     }
   } catch (err) {
-    throw new Error(error);
+    throw new Error(err);
   }
 }
 

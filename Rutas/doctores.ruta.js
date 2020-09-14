@@ -6,6 +6,8 @@
 const { Router } = require('express');
 const { obtenerDoctores, obtenerDoctorPorID, crearDoctor,actualizarDoctor, eliminarDoctor,obtenerNombreDoctores } = require('../Controladores/doctores.controller');
 const { validarJWT } = require('../middlewares/jwt.middleware');
+const { validarCampos } = require('../middlewares/fieldValidator.middleware');
+const { check } = require('express-validator');
 
 const router = Router();
 
@@ -64,7 +66,16 @@ router.get('/:id', async (req, res, next) => {
 //////////
 // Post
 //////////
-router.post('/', async (req, res, next) => {
+router.post('/',[
+  check('Nombre','El campo nombre es obligatorio').not().isEmpty(),
+  check('PrimerApellido','El campo Prime rApellido es obligatorio').not().isEmpty(),
+  check('Correo','El campo Correo es obligatorio').not().isEmpty(),
+  check('FechaNacimiento','El campo Fecha de Nacimiento es obligatorio').not().isEmpty(),
+  check('Celular','El campo Celular es obligatorio').not().isEmpty(),
+  check('Locacion','El campo Locacion es obligatorio').not().isEmpty(),
+  check('Titulo','El campo Titulo es obligatorio').not().isEmpty(),
+  validarCampos
+], async (req, res, next) => {
   console.log('\x1b[36m%s\x1b[0m','POST /api/doctores')
   var body = req.body;
 
@@ -83,7 +94,17 @@ router.post('/', async (req, res, next) => {
 //////////
 // Put
 //////////
-router.put('/:id', validarJWT, async (req, res, next) => {
+router.put('/:id', [
+  validarJWT,
+  check('Nombre','El campo nombre es obligatorio').not().isEmpty(),
+  check('PrimerApellido','El campo Prime rApellido es obligatorio').not().isEmpty(),
+  check('Correo','El campo Correo es obligatorio').not().isEmpty(),
+  check('FechaNacimiento','El campo Fecha de Nacimiento es obligatorio').not().isEmpty(),
+  check('Celular','El campo Celular es obligatorio').not().isEmpty(),
+  check('Locacion','El campo Locacion es obligatorio').not().isEmpty(),
+  check('Titulo','El campo Titulo es obligatorio').not().isEmpty(),
+  validarCampos
+], async (req, res, next) => {
   var id = req.params.id;
   var body = req.body;
   console.log('\x1b[36m%s\x1b[0m','PUT /api/doctores/' + id)
