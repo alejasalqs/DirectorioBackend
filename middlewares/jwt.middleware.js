@@ -28,14 +28,15 @@ const validarJWT = async (req, res, next) => {
 }
 
 const verificarToken = async (req, res, next) => {
-    const token = req.header('x-token');
+    const token = req.query;
 
-    try {
-        const { id } = jwt.verify(token, SEED);
-        req.enviarAgendado = 1;
-        next();
-    } catch (error) {
+    console.log(!Object.keys(token).length === 0);
+
+    if (Object.keys(token).length === 0) {
         req.enviarAgendado = 0;
+        next();
+    } else {
+        req.enviarAgendado = 1;
         next();
     }
 } 

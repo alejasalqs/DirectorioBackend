@@ -52,8 +52,6 @@ const llenarDatosAgenda = async (objeto) => {
 
   dias = dias.map(d => d.Dia.toLowerCase());
 
-  console.log(dias)
-
   let inicio = moment(data.FechaInicial, 'YYYY-MM-DD HH:mm').format("YYYY-MM-DD HH:mm");
   let final = moment(data.FechaFinal, 'YYYY-MM-DD HH:mm').format("YYYY-MM-DD HH:mm");
 
@@ -68,13 +66,13 @@ const llenarDatosAgenda = async (objeto) => {
       const data = await storeProcedure('AgregarEventoAgenda', {
         start: inicio,
         endDate: finCita,
-        title: `Espacio disponible: ${moment(inicio).hour()}-${moment(finCita).hour()}`,
+        title: `${moment(inicio).format('hh:mm')}-${moment(finCita).format('hh:mm A')}`,
         IdDoctor: objeto.IdDoctor
       })
       inicio = finCita;
     }
     inicio = moment(inicio).hour( moment(data.FechaInicial).hour() );
-    inicio = moment(inicio, "YYYY-MM-DD HH:mm").add(1, 'd').format("YYYY-MM-DD HH:mm");
+    inicio = moment(inicio, "YYYY-MM-DD HH:mm").add(1, 'd').format("YYYY-MM-DD HH:mm A");
   }
     
   return "data[0]";

@@ -8,7 +8,7 @@ const crearMetodoDeTransporte = async () => {
     return nodemailer.createTransport({
         maxConnections: 3,
         pool: true,
-        host: "smtp.live.com",
+        host: "secure.emailsrvr.com",
         port: 587,
         secure: false, // upgrade later with STARTTLS
         auth: {
@@ -32,7 +32,7 @@ const enviarEmail = async (datos, plantilla, asunto, para) => {
         const htmlToSend = template(replacements);
         // Definimos el email
         const mailOptions = {
-            from: '"Argus Salud" <alejandrosalgueroq@hotmail.com>',
+            from: '"Argus Salud" <notificaciones@argus-salud.com>',
             to: para,
             subject: asunto,
             html : htmlToSend

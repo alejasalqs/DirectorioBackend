@@ -15,7 +15,7 @@ const autenticaLogin = async (objeto) => {
     if (data.length === 0) {
       return {
         ok: false,
-        mensaje: 'Credenciales incorrectas - email',
+        mensaje: 'Credenciales incorrectas',
       };
     }
 
@@ -26,7 +26,7 @@ const autenticaLogin = async (objeto) => {
     if (!validPassword) {
       return {
         ok: false,
-        mensaje: 'Credenciales incorrectas - password',
+        mensaje: 'Credenciales incorrectas',
       };
     }
   

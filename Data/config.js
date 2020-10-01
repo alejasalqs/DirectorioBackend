@@ -7,13 +7,13 @@ module.exports = {
     DB_INSTANCE_NAME: 'MSSQLSERVER',
   },
   correo: {
-    USER: 'alejandrosalgueroq@hotmail.com',
-    PASS: ':pokemon987654321',
-    FROM: 'alejandrosalgueroq@hotmail.com'
+    USER: 'notificaciones@argus-salud.com',
+    PASS: '4dministrA',
+    FROM: 'notificaciones@argus-salud.com'
   },
   twilio: {
     accountSid: 'AC089ca578406ecab71ddca13b6239aa19',
-    authToken: '54d2654f39db2ce6ca0eb0bfa32f0d37',
+    authToken: '048383ef22fd6603c767804ece711a52',
     from: '',
   }
 };
