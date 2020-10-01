@@ -12,8 +12,8 @@ module.exports = {
     FROM: 'notificaciones@argus-salud.com'
   },
   twilio: {
-    accountSid: 'AC089ca578406ecab71ddca13b6239aa19',
-    authToken: '048383ef22fd6603c767804ece711a52',
+    accountSid: '',
+    authToken: '',
     from: '',
   }
 };
