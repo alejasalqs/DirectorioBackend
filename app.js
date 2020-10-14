@@ -5,6 +5,15 @@ const db = require('./Data/database');
 const cors = require('cors');
 const { enviarRecordatorioCita } = require('./Helpers/recordatorios.helpers')
 
+const https = require("https"),
+	fs = require("fs");
+	
+	
+const options = {
+	key: fs.readFileSync("C:\\Publicado Node JS\\CertificadoEnUso\\privkey.pem"),
+	cert: fs.readFileSync("C:\\Publicado Node JS\\CertificadoEnUso\\fullchain.pem")
+};
+
 // Creamos el servidor
 var app = express();
 
@@ -14,9 +23,13 @@ app.use(cors())
 // Lectura y parseo del body
 app.use(express.json());
 
-app.listen(3000, () => {
-  console.log('🚀 Express server corriendo en el puerto 3000');
+// En este se crea el server http en el puetro
+app.listen(3001, () => {
+  console.log('🚀 Express server corriendo en el puerto 3001');
 });
+
+// En este se crea el server https en el puetro
+https.createServer(options, app).listen(3000);
 
 // Se instancia la base de datos
 db.sequelize.authenticate()
