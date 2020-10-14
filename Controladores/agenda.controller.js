@@ -1,6 +1,6 @@
 var db = require('../Data/database');
 const { storeProcedure } = require('../Utilidades/db.utils');
-const { darFormatoFechaDDMMYYYY } = require('../Utilidades/fechas.utils');
+const { darFormatoFechaDDMMYYYY, compararHoras } = require('../Utilidades/fechas.utils');
 const { enviarEmail } = require('../Helpers/email.helpers');
 const { enviarMensajeWP, enviarMensajeSMS } = require('../Helpers/whatsApp.helpers');
 var moment = require('moment'); // require
@@ -50,7 +50,13 @@ const llenarDatosAgenda = async (objeto) => {
 
   let dias = await storeProcedure('ObtenerDiasLaborales',{ IdDoctor: objeto.IdDoctor })
 
+  let horas = await storeProcedure('ObtenerHoras', { IdDoctor: objeto.IdDoctor })
+
   dias = dias.map(d => d.Dia.toLowerCase());
+
+  horas = horas.map(h => ({ HoraInicial: h.HoraInicial, HoraFinal: h.HoraFinal }));
+
+  //console.log(horas)
 
   let inicio = moment(data.FechaInicial, 'YYYY-MM-DD HH:mm').format("YYYY-MM-DD HH:mm");
   let final = moment(data.FechaFinal, 'YYYY-MM-DD HH:mm').format("YYYY-MM-DD HH:mm");
@@ -58,17 +64,29 @@ const llenarDatosAgenda = async (objeto) => {
   while(moment(inicio).isBefore(final,'day')) {
     for (let i = 1; i <= parseInt(objeto.HorasLaborales); i++) {
       finCita =  moment(inicio, "YYYY-MM-DD HH:mm").add(1, 'h').format("YYYY-MM-DD HH:mm").toString();
+      let skip = false;
 
       if (!dias.includes(moment(inicio).locale('es').format('dddd'))) {
         break;
       }
+
+      for (let hora of horas) {
+        skip = false;
+        if(await compararHoras(inicio, hora.HoraInicial, hora.HoraFinal)) {
+          skip = true;
+          break;
+        }
+      }
+
+      if (!skip) {
+        const data = await storeProcedure('AgregarEventoAgenda', {
+          start: inicio,
+          endDate: finCita,
+          title: `${moment(inicio).format('hh:mm')}-${moment(finCita).format('hh:mm A')}`,
+          IdDoctor: objeto.IdDoctor
+        })
+      }
       
-      const data = await storeProcedure('AgregarEventoAgenda', {
-        start: inicio,
-        endDate: finCita,
-        title: `${moment(inicio).format('hh:mm')}-${moment(finCita).format('hh:mm A')}`,
-        IdDoctor: objeto.IdDoctor
-      })
       inicio = finCita;
     }
     inicio = moment(inicio).hour( moment(data.FechaInicial).hour() );
@@ -104,9 +122,9 @@ const insertarDetalleEvento = async (id,objeto) => {
 
   const correo = await enviarEmail(data[0],'agendacionCita',"Agendación de nueva cita",enviarACorreo);
 
-  const wp = await enviarMensajeWP(data[0]);
+  //const wp = await enviarMensajeWP(data[0]);
 
-  const sms = await enviarMensajeSMS(data[0])
+  //const sms = await enviarMensajeSMS(data[0])
   
   return data[0];
 }
@@ -115,8 +133,6 @@ const insertarDetalleEvento = async (id,objeto) => {
 const configurarDiasLaborales = async (dias) => {
 
   const diasBD = await storeProcedure('ObtenerDiasLaborales' , { IdDoctor: dias[0].IdDoctor});
-
-  console.log(diasBD.length)
 
   let data;
 
@@ -134,10 +150,36 @@ const configurarDiasLaborales = async (dias) => {
   return data[0];
 } 
 
+
+const configurarHoras = async (idDoctor, Descripcion, HoraInicial, HoraFinal) => {
+  const data = await storeProcedure('AñadirHoras', {idDoctor, Descripcion, HoraInicial, HoraFinal});
+
+  return data[0];
+}
+
 const cancelarCitaAgenda = async (id) => {
   const data = await storeProcedure('CancelarCita', {IdAgenda: id});
 
   return data[0];
+}
+
+
+const obtenerDiasLaborales = async (idDoctor) => {
+  const data = await storeProcedure('ObtenerDiasLaborales', {idDoctor});
+
+  return data;
+}
+
+const obtenerHoras = async (idDoctor) => {
+  const data = await storeProcedure('ObtenerHoras', {idDoctor});
+
+  return data;
+}
+
+const eliminarHoras = async (idDoctor, HoraID) => {
+  const data = await storeProcedure('DesactivarHora', {idDoctor, HoraID});
+
+  return data;
 }
 
 module.exports = {
@@ -149,5 +191,9 @@ module.exports = {
     obtenerEventosAgendados,
     configurarDiasLaborales,
     obtenerDetalleEventosAgenda,
-    cancelarCitaAgenda
+    cancelarCitaAgenda,
+    configurarHoras,
+    obtenerHoras,
+    obtenerDiasLaborales,
+    eliminarHoras
 }

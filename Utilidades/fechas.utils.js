@@ -17,6 +17,21 @@ const darFormatoFechaDDMMYYYY = async (obj) => {
     }
 }
 
+const compararHoras = async (hora, horaInicioEvento, horaFinalEvento) => {
+    hora = new Date(hora).getHours() + ':' + new Date(hora).getMinutes().toString();
+    horaInicioEvento = horaInicioEvento.split(':');
+    horaFinalEvento = horaFinalEvento.split(':');
+
+    
+    if ((hora.split(':')[0] >= horaInicioEvento[0]) && (hora.split(':')[0] < horaFinalEvento[0])) {
+        return true;
+    }
+
+    return false;
+}
+
+
 module.exports = {
-    darFormatoFechaDDMMYYYY
+    darFormatoFechaDDMMYYYY,
+    compararHoras
 }

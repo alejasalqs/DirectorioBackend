@@ -4,7 +4,7 @@
 
 */
 const { Router } = require('express');
-const { obtenerEventosAgenda, actualizarEventoAgenda, agregarEventoAgenda,llenarDatosAgenda,insertarDetalleEvento, obtenerEventosAgendados, configurarDiasLaborales, obtenerDetalleEventosAgenda, cancelarCitaAgenda } = require('../Controladores/agenda.controller');
+const { obtenerEventosAgenda, actualizarEventoAgenda, agregarEventoAgenda,llenarDatosAgenda,insertarDetalleEvento, obtenerEventosAgendados, configurarDiasLaborales, obtenerDetalleEventosAgenda, cancelarCitaAgenda, configurarHoras, obtenerHoras, obtenerDiasLaborales, eliminarHoras } = require('../Controladores/agenda.controller');
 const { validarJWT, verificarToken } = require('../middlewares/jwt.middleware');
 const { darFormatoFechaDDMMYYYY } = require('../Utilidades/fechas.utils');
 const { check } = require('express-validator');
@@ -47,6 +47,29 @@ router.get('/detalle/:id',[verificarToken], async (req, res) => {
   });
 });
 
+
+router.get('/diaslaborales/:id',[verificarToken], async (req, res) => {
+  const id = req.params.id;
+
+  const data = await obtenerDiasLaborales(id);
+
+  return res.status(200).json({ 
+    ok: true,
+    dias: data
+  });
+});
+
+
+router.get('/horas/:id',[verificarToken], async (req, res) => {
+  const id = req.params.id;
+
+  const data = await obtenerHoras(id);
+
+  return res.status(200).json({ 
+    ok: true,
+    horas: data
+  });
+});
 
 //////////
 // Post
@@ -146,6 +169,30 @@ router.post('/dias', [verificarToken], async (req, res, next) => {
   }
 });
 
+//////////
+// Post
+//////////
+router.post('/configurarhoras', [
+  verificarToken,
+  check('Descripcion','El campo Descripcion es campo obligatorio').not().isEmpty(),
+  check('HoraInicial','El campo HoraInicial es campo obligatorio').not().isEmpty(),
+  check('HoraFinal','El campo HoraFinal es campo obligatorio').not().isEmpty(),
+  validarCampos
+], async (req, res, next) => {
+  console.log('\x1b[36m%s\x1b[0m','PUT /api/agenda/configurarhoras')
+  const { idDoctor, Descripcion, HoraInicial, HoraFinal } = req.body;
+
+  try {
+    const data = await configurarHoras(idDoctor, Descripcion, HoraInicial, HoraFinal);
+    
+    return res.status(201).json({ 
+      ok: true,
+      mensaje: data
+    });
+  }catch (error) {
+    next(error)
+  }
+});
 
 //////////
 // Post
@@ -157,6 +204,27 @@ router.delete('/:id', [verificarToken], async (req, res, next) => {
 
   try {
     const data = await cancelarCitaAgenda(id);
+    
+    return res.status(200).json({ 
+      ok: true,
+      mensaje: data
+    });
+  }catch (error) {
+    next(error)
+  }
+});
+
+//////////
+// Post
+//////////
+router.delete('/horas/:idDoctor/:idHora', [verificarToken], async (req, res, next) => {
+  const idDoctor = req.params.idDoctor;
+  const idHora = req.params.idHora;
+  console.log('\x1b[36m%s\x1b[0m','DELETE /api/agenda/horas' + idDoctor)
+  var body = req.body;
+
+  try {
+    const data = await eliminarHoras(idDoctor, idHora);
     
     return res.status(200).json({ 
       ok: true,
